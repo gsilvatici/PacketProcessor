@@ -49,7 +49,14 @@ TEST_F(PacketProcessorTest, InitializeReader)
 
 TEST_F(PacketProcessorTest, InitializeWriters) 
 {
+        packetProcessor->InitializeWriter("out_file.pcap");
+        pcpp::PcapFileWriterDevice* writer = packetProcessor->getPacketWriter();
 
+        ASSERT_TRUE(writer->open());
+}
+
+TEST_F(PacketProcessorTest, FilterNonEthernetPacket) 
+{
         pcpp::PcapFileWriterDevice* writer = packetProcessor->getPacketWriter();
 
         ASSERT_TRUE(writer->open());

@@ -62,3 +62,8 @@ pcpp::PcapFileWriterDevice* PacketProcessor::getPacketWriter()
 {
         return this->writer;
 }
+
+pcpp::PcapFileWriterDevice* PacketProcessor::FilterNonEthernet()
+{
+        return this->writer;
+}
