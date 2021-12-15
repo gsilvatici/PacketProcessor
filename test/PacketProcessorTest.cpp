@@ -50,14 +50,105 @@ TEST(PacketFiltering, PcapFileWithOnlyOneEthernetPacket)
     pcpp::IFileReaderDevice* reader = packetProcessor->getPacketReader();
 
     pcpp::RawPacket rawPacket;
-	while (reader->getNextPacket(rawPacket))
-	{
-        pcpp::Packet parsedPacket(&rawPacket);
+	reader->getNextPacket(rawPacket);
+    
+    pcpp::Packet parsedPacket(&rawPacket);
 
-        pcpp::Packet* outPacket = packetProcessor->FilterNonEthernet(&parsedPacket);
-        
-        ASSERT_NE(outPacket, nullptr);
+    pcpp::Packet* outPacket = packetProcessor->FilterNonEthernet(&parsedPacket);
+    
+    ASSERT_NE(outPacket, nullptr);
+
+    delete packetProcessor;
+}
+
+TEST(PacketFiltering, PcapFileWithOnlyOneIPv4Packet) 
+{
+    PacketProcessor* packetProcessor = new PacketProcessor();
+    packetProcessor->InitializeReader("../scapySamples/test_sample.pcap");
+
+    pcpp::IFileReaderDevice* reader = packetProcessor->getPacketReader();
+
+    pcpp::RawPacket rawPacket;
+	reader->getNextPacket(rawPacket);
+    
+    pcpp::Packet parsedPacket(&rawPacket);
+
+    pcpp::Packet* outPacket = nullptr;
+
+    if (packetProcessor->FiltersIpVersion()) 
+    {
+        outPacket = packetProcessor->FilterByIpVersion(&parsedPacket);    
     }
+
+    ASSERT_NE(outPacket, nullptr);
+
+    delete packetProcessor;
+}
+
+TEST(PacketFiltering, PcapFileWithOnlyOneIPv6Packet) 
+{
+    PacketProcessor* packetProcessor = new PacketProcessor();
+    packetProcessor->InitializeReader("../scapySamples/test_sample.pcap");
+
+    pcpp::IFileReaderDevice* reader = packetProcessor->getPacketReader();
+
+    pcpp::RawPacket rawPacket;
+	reader->getNextPacket(rawPacket);
+    
+    pcpp::Packet parsedPacket(&rawPacket);
+
+    pcpp::Packet* outPacket = nullptr;
+
+    if (packetProcessor->FiltersIpVersion()) 
+    {
+        outPacket = packetProcessor->FilterByIpVersion(&parsedPacket);    
+    }
+
+    ASSERT_NE(outPacket, nullptr);
+
+    delete packetProcessor;
+}
+
+TEST(PacketFiltering, PcapFileWithOnlyOneVlanIdOfCeroPacket) 
+{
+    PacketProcessor* packetProcessor = new PacketProcessor();
+    packetProcessor->InitializeReader("../scapySamples/test_sample.pcap");
+
+    pcpp::IFileReaderDevice* reader = packetProcessor->getPacketReader();
+
+    pcpp::RawPacket rawPacket;
+	reader->getNextPacket(rawPacket);
+    
+    pcpp::Packet parsedPacket(&rawPacket);
+
+    pcpp::Packet* outPacket = nullptr;
+
+    if (packetProcessor->FiltersByVLAN()) 
+    {
+        // outPacket = packetProcessor->FilterByVLAN(&parsedPacket);    
+    }
+
+    ASSERT_NE(outPacket, nullptr);
+
+    delete packetProcessor;
+}
+
+TEST(PacketFiltering, PcapFileWithOnlyOneICMPPacket) 
+{
+    PacketProcessor* packetProcessor = new PacketProcessor();
+    packetProcessor->InitializeReader("../scapySamples/test_sample.pcap");
+
+    pcpp::IFileReaderDevice* reader = packetProcessor->getPacketReader();
+
+    pcpp::RawPacket rawPacket;
+	reader->getNextPacket(rawPacket);
+    
+    pcpp::Packet parsedPacket(&rawPacket);
+
+    // pcpp::Packet* outPacket = outPacket = packetProcessor->FilterICMP(&parsedPacket);    
+   
+    // ASSERT_NE(outPacket, nullptr);
+
     delete packetProcessor;
 }
 

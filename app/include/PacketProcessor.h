@@ -36,6 +36,7 @@ class PacketProcessor
     pcpp::IFileReaderDevice*    getPacketReader();
     pcpp::PcapFileWriterDevice* getPacketWriter();
     pcpp::Packet* FilterNonEthernet(pcpp::Packet* parsedPacket);
+    pcpp::Packet* FilterByIpVersion(pcpp::Packet* parsedPacket);
     // public ProcessPacket(pcpp::RawPacket rawPacket);
 };
 

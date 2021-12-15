@@ -97,8 +97,21 @@ pcpp::Packet* PacketProcessor::FilterNonEthernet(pcpp::Packet* parsedPacket)
         if (curLayer->getProtocol() != pcpp::Ethernet)
         {
                 return nullptr;
-        } else 
-        {
+        } else {
                 return parsedPacket;
+        }
+}
+
+pcpp::Packet* PacketProcessor::FilterByIpVersion(pcpp::Packet* parsedPacket)
+{
+        for (pcpp::Layer* curLayer = parsedPacket->getFirstLayer(); curLayer != NULL; curLayer = curLayer->getNextLayer())
+        {
+                if (curLayer->getProtocol() == pcpp::Ethernet)
+                {
+                        return nullptr;
+                } else 
+                {
+                        return parsedPacket;
+                }
         }
 }
