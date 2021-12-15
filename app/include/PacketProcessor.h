@@ -1,6 +1,8 @@
 #ifndef GTEST_PACKETPROCESSOR_H_
 #define GTEST_PACKETPROCESSOR_H_
 
+#include <iostream>
+
 #include "PcapFileDevice.h"
 #include "Packet.h"
 
@@ -23,12 +25,13 @@ class PacketProcessor
   public:
     PacketProcessor();
     PacketProcessor(int vlanId, int ipVersion, int ttl, int dnsAddress, int dnsPort);
+    ~PacketProcessor();
     bool FiltersByVLAN();
     bool FiltersIpVersion();
     bool ReducesTTL();
     bool ReplacesDnsAddress();
     bool ReplacesDnsPort();
-    void InitializeReader(std::string inputFile);
+    bool InitializeReader(std::string inputFile);
     void InitializeWriter(std::string outputFile);
     pcpp::IFileReaderDevice*    getPacketReader();
     pcpp::PcapFileWriterDevice* getPacketWriter();

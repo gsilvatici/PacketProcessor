@@ -111,7 +111,7 @@ int main(int argc, char* argv[])
             case ip_version:
                 if (OPTIONAL_ARGUMENT_IS_PRESENT)
                 {
-                    
+
                 }
 				break;
 			case ttl:
@@ -185,11 +185,6 @@ int main(int argc, char* argv[])
         pcpp::Packet parsedPacket(&rawPacket);
 
         pcpp::Layer* curLayer = parsedPacket.getFirstLayer();
-        
-        // filter packets that dont comply with rule 1
-        if (curLayer->getProtocol() != pcpp::Ethernet)
-        {
-            continue;
-        }
+	}
 
 }

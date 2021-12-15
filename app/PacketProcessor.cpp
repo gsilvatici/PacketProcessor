@@ -7,6 +7,8 @@ PacketProcessor::PacketProcessor()
         this->ttl =        -1;
         this->dnsAddress = -1;
         this->dnsPort =    -1;
+        this->reader =  nullptr;
+        this->writer =  nullptr;
 }
 
 PacketProcessor::PacketProcessor(int vlanId, int ipVersion, int ttl, int dnsAddress, int dnsPort)
@@ -16,6 +18,23 @@ PacketProcessor::PacketProcessor(int vlanId, int ipVersion, int ttl, int dnsAddr
         this->ttl =        ttl;
         this->dnsAddress = dnsAddress;
         this->dnsPort =    dnsPort;
+        this->reader =  nullptr;
+        this->writer =  nullptr;
+}
+
+PacketProcessor::~PacketProcessor()
+{
+        if(this->reader != nullptr) 
+        {
+                reader->close();
+                delete reader;
+        }
+        
+        if(this->writer != nullptr) 
+        {
+                writer->close();
+                delete writer;
+        }
 }
 
 bool PacketProcessor::FiltersByVLAN()
@@ -43,9 +62,16 @@ bool PacketProcessor::ReplacesDnsPort()
         return this->dnsPort == -1 ? false : true;
 }
 
-void PacketProcessor::InitializeReader(std::string inputFile)
+bool PacketProcessor::InitializeReader(std::string inputFile)
 {
         reader = pcpp::IFileReaderDevice::getReader(inputFile);
+        if (reader != nullptr)
+        {
+                return reader->open();
+        } else {
+                return false;        
+        }
+        
 }
 
 void PacketProcessor::InitializeWriter(std::string outputFile)
@@ -67,12 +93,12 @@ pcpp::Packet* PacketProcessor::FilterNonEthernet(pcpp::Packet* parsedPacket)
 {
         pcpp::Layer* curLayer = parsedPacket->getFirstLayer();
 
-        return parsedPacket;
-        // if (curLayer->getProtocol() != pcpp::Ethernet)
-        // {
-        //         return nullptr;
-        // } else 
-        // {
-        //         return parsedPacket;
-        // }
+        // return parsedPacket;
+        if (curLayer->getProtocol() != pcpp::Ethernet)
+        {
+                return nullptr;
+        } else 
+        {
+                return parsedPacket;
+        }
 }

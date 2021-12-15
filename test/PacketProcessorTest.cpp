@@ -1,30 +1,16 @@
 #include "../app/include/PacketProcessor.h"
 #include "gtest/gtest.h"
 
-// namespace
-// {
-
-// // Tests Factorial().
-
-// // Tests factorial of 0.
-// TEST(FactorialTest, Zero)
-// {
-//     EXPECT_EQ(1, Factorial(0));
-// }
-
-// }
-
 namespace
 {
-
 class PacketProcessorTest : public ::testing::Test
 {
   protected:
-    PacketProcessor* packetProcessor;
+    // PacketProcessor* packetProcessor;
 
     void SetUp() override
     {
-        packetProcessor = new PacketProcessor();
+        // packetProcessor = new PacketProcessor();
     }
 
     void TearDown() override
@@ -34,46 +20,33 @@ class PacketProcessorTest : public ::testing::Test
     }
 };
 
-TEST_F(PacketProcessorTest, InitializeReader)
+TEST(Initializer, InitializeReader)
 {
-    packetProcessor->InitializeReader("../scapySamples/test_sample.pcap");
-    pcpp::IFileReaderDevice* reader = packetProcessor->getPacketReader();
-    // verify that a reader interface was indeed created
-    ASSERT_NE(reader,         nullptr);
+    PacketProcessor* packetProcessor = new PacketProcessor();
+    bool initStatus = packetProcessor->InitializeReader("../scapySamples/test_sample.pcap");
+
     // open the reader for reading
-    ASSERT_EQ(reader->open(), true);
+    ASSERT_EQ(initStatus, true);
+
+    delete packetProcessor;
 }
 
-TEST_F(PacketProcessorTest, InitializeWriters) 
-{
-    packetProcessor->InitializeWriter("out_file.pcap");
-    pcpp::PcapFileWriterDevice* writer = packetProcessor->getPacketWriter();
-
-    ASSERT_TRUE(writer->open());
-}
-
-// TEST_F(PacketProcessorTest, FilterDataLinkLayerFromAllEthernetPcapFile) 
+// TEST(Initializer, InitializeWriter) 
 // {
-//     pcpp::IFileReaderDevice* reader = packetProcessor->getPacketReader();
+//     PacketProcessor* packetProcessor = new PacketProcessor();
+//     packetProcessor->InitializeWriter("out_file.pcap");
+//     pcpp::PcapFileWriterDevice* writer = packetProcessor->getPacketWriter();
 
-// 	pcpp::RawPacket rawPacket;
+//     ASSERT_TRUE(writer->open());
 
-//     reader->getNextPacket(rawPacket);
-// 	// while (reader->getNextPacket(rawPacket))
-// 	// {
-//     //     pcpp::Packet parsedPacket(&rawPacket);
-
-//     //     // pcpp::Packet* outPacket = packetProcessor->FilterNonEthernet(&parsedPacket);
-        
-//     //     break;
-//     //     // ASSERT_NE(outPacket, nullptr);
-//     // }
+//     delete packetProcessor;
 // }
 
-TEST(PacketFiltering, PcapFileWithOnlyEthernetPackets) 
+TEST(PacketFiltering, PcapFileWithOnlyOneEthernetPacket) 
 {
     PacketProcessor* packetProcessor = new PacketProcessor();
     packetProcessor->InitializeReader("../scapySamples/test_sample.pcap");
+
     pcpp::IFileReaderDevice* reader = packetProcessor->getPacketReader();
 
     pcpp::RawPacket rawPacket;
@@ -83,9 +56,9 @@ TEST(PacketFiltering, PcapFileWithOnlyEthernetPackets)
 
         pcpp::Packet* outPacket = packetProcessor->FilterNonEthernet(&parsedPacket);
         
-        // break;
         ASSERT_NE(outPacket, nullptr);
     }
+    delete packetProcessor;
 }
 
 }
