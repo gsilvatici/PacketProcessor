@@ -63,7 +63,16 @@ pcpp::PcapFileWriterDevice* PacketProcessor::getPacketWriter()
         return this->writer;
 }
 
-pcpp::PcapFileWriterDevice* PacketProcessor::FilterNonEthernet()
+pcpp::Packet* PacketProcessor::FilterNonEthernet(pcpp::Packet* parsedPacket)
 {
-        return this->writer;
+        pcpp::Layer* curLayer = parsedPacket->getFirstLayer();
+
+        return parsedPacket;
+        // if (curLayer->getProtocol() != pcpp::Ethernet)
+        // {
+        //         return nullptr;
+        // } else 
+        // {
+        //         return parsedPacket;
+        // }
 }
