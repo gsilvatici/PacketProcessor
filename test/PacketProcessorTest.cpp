@@ -40,7 +40,7 @@ TEST(Initializer, InitializeWriter)
     delete packetProcessor;
 }
 
-TEST(PacketFiltering, FileWithOnlyOneEthernetPacket) 
+TEST(FilterEthernetPacket, FromFileWithOnlyOneEthernetPacket) 
 {
     PacketProcessor* packetProcessor = new PacketProcessor();
     packetProcessor->InitializeReader("../scapySamples/1_eth_packet.pcap");
@@ -60,7 +60,7 @@ TEST(PacketFiltering, FileWithOnlyOneEthernetPacket)
     delete packetProcessor;
 }
 
-TEST(PacketFiltering, FileWithOnlyOneNonEthernetPacket) 
+TEST(FilterEthernetPacket, FromFileWithOnlyOneNonEthernetPacket) 
 {
     PacketProcessor* packetProcessor = new PacketProcessor();
     packetProcessor->InitializeReader("../scapySamples/1_ppp_packet.pcap");
@@ -78,7 +78,7 @@ TEST(PacketFiltering, FileWithOnlyOneNonEthernetPacket)
     delete packetProcessor;
 }
 
-TEST(PacketFiltering, FileWithOnlyOneIPv4PacketToFilterIPv6) 
+TEST(FilterIPv6Packet, FromFileWithOnlyOneIPv4Packet) 
 {
     PacketProcessor* packetProcessor = new PacketProcessor();
     packetProcessor->setIpVersion(4);
@@ -100,29 +100,7 @@ TEST(PacketFiltering, FileWithOnlyOneIPv4PacketToFilterIPv6)
     delete packetProcessor;
 }
 
-TEST(PacketFiltering, FileWithOnlyOneIPv4PacketToFilterIPv4) 
-{
-    PacketProcessor* packetProcessor = new PacketProcessor();
-    packetProcessor->setIpVersion(6);
-    packetProcessor->InitializeReader("../scapySamples/1_ipv4_packet.pcap");
-
-    pcpp::IFileReaderDevice* reader = packetProcessor->getPacketReader();
-
-    pcpp::RawPacket rawPacket;
-	  reader->getNextPacket(rawPacket);
-    pcpp::Packet parsedPacket(&rawPacket);
-    pcpp::Packet* outPacket = nullptr;
-
-    if (packetProcessor->FiltersIpVersion()) {
-        outPacket = packetProcessor->FilterByIpVersion(&parsedPacket);    
-    }
-
-    ASSERT_EQ(outPacket, nullptr);
-
-    delete packetProcessor;
-}
-
-TEST(PacketFiltering, FileWithOnlyOneIPv6PacketToFilterIPv6) 
+TEST(FilterIPv6Packet, FromFileWithOnlyOneIPv6Packet) 
 {
     PacketProcessor* packetProcessor = new PacketProcessor();
     packetProcessor->setIpVersion(4);
@@ -144,7 +122,29 @@ TEST(PacketFiltering, FileWithOnlyOneIPv6PacketToFilterIPv6)
     delete packetProcessor;
 }
 
-TEST(PacketFiltering, FileWithOnlyOneIPv6PacketToFilterIPv4) 
+TEST(FilterIPv4Packet, FromFileWithOnlyOneIPv4Packet) 
+{
+    PacketProcessor* packetProcessor = new PacketProcessor();
+    packetProcessor->setIpVersion(6);
+    packetProcessor->InitializeReader("../scapySamples/1_ipv4_packet.pcap");
+
+    pcpp::IFileReaderDevice* reader = packetProcessor->getPacketReader();
+
+    pcpp::RawPacket rawPacket;
+	  reader->getNextPacket(rawPacket);
+    pcpp::Packet parsedPacket(&rawPacket);
+    pcpp::Packet* outPacket = nullptr;
+
+    if (packetProcessor->FiltersIpVersion()) {
+        outPacket = packetProcessor->FilterByIpVersion(&parsedPacket);    
+    }
+
+    ASSERT_EQ(outPacket, nullptr);
+
+    delete packetProcessor;
+}
+
+TEST(FilterIPv4Packet, FromFileWithOnlyOneIPv6Packet) 
 {
     PacketProcessor* packetProcessor = new PacketProcessor();
     packetProcessor->setIpVersion(6);
