@@ -7,8 +7,11 @@ wrpcap('1_eth_packet.pcap', [packet])
 packet = PPP()
 wrpcap('1_ppp_packet.pcap', [packet])
 
-packet = Ether() / IP(dst="1.2.3.4")
+packet = Ether() / IP(dst="1.2.3.4", src="1.2.3.4", ttl=20) / Dot1Q(vlan=23)
 wrpcap('1_ipv4_packet.pcap', [packet])
+
+packet = Ether() / IP(dst="1.2.3.4", src="1.2.3.4") / Dot1Q(vlan=4094)
+wrpcap('1_ipv4_packet_bis.pcap', [packet])
 
 packet = Ether() / IPv6(dst="fe80::0123:4567")
 wrpcap('1_ipv6_packet.pcap', [packet])

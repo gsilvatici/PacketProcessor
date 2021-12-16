@@ -5,7 +5,8 @@
 
 #include "PcapFileDevice.h"
 #include "Packet.h"
-
+#include "VlanLayer.h"
+#include "IPv4Layer.h"
 // #include <PcapPlusPlusVersion.h>
 // #include <SystemUtils.h>
 // #include "stdlib.h"
@@ -13,8 +14,7 @@
 class PacketProcessor
 {
   private:
-    //uint16_t
-    int vlanId;
+    uint16_t vlanId;
     int ipVersion;
     int ttl;
     int dnsAddress;
@@ -31,7 +31,7 @@ class PacketProcessor
     void setTTL(int ttl);
     void setDnsAddress(int dnsAddress);
     void setDnsPort(int dnsPort);
-    bool FiltersByVLAN();
+    bool FiltersVLAN();
     bool FiltersIpVersion();
     bool ReducesTTL();
     bool ReplacesDnsAddress();
@@ -40,8 +40,10 @@ class PacketProcessor
     bool InitializeWriter(std::string outputFile);
     pcpp::IFileReaderDevice*    getPacketReader();
     pcpp::PcapFileWriterDevice* getPacketWriter();
+    pcpp::Packet* FilterVlanId(pcpp::Packet* parsedPacket);
     pcpp::Packet* FilterNonEthernet(pcpp::Packet* parsedPacket);
-    pcpp::Packet* FilterByIpVersion(pcpp::Packet* parsedPacket);
+    pcpp::Packet* FilterIpVersion(pcpp::Packet* parsedPacket);
+    pcpp::Packet* ReduceTTL(pcpp::Packet* parsedPacket);
     // public ProcessPacket(pcpp::RawPacket rawPacket);
 };
 
