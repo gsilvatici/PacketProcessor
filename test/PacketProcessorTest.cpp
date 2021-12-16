@@ -297,10 +297,10 @@ TEST(FilterICMPPacket, FromFileWithOnlyOneICMPPacket)
     delete packetProcessor;
 }
 
-TEST(ReplaceDnsAddress, FromFileWithOnlyOneTCPPacketWithDNSLayer) 
+TEST(ReplaceDnsAddressAndPort, FromFileWithOnlyOneTCPPacketWithDNSLayer) 
 {
     PacketProcessor* packetProcessor = new PacketProcessor();
-    packetProcessor->setIpVersion(6);
+    // packetProcessor->setDnsAddress();
     packetProcessor->InitializeReader("../scapySamples/1_ipv6_packet.pcap");
 
     pcpp::IFileReaderDevice* reader = packetProcessor->getPacketReader();
@@ -312,9 +312,9 @@ TEST(ReplaceDnsAddress, FromFileWithOnlyOneTCPPacketWithDNSLayer)
 
     pcpp::Packet* outPacket = nullptr;
 
-    if (packetProcessor->FiltersIpVersion()) {
-        outPacket = packetProcessor->FilterIpVersion(&parsedPacket);    
-    }
+    outPacket = packetProcessor->ReplaceDnsAddress(&parsedPacket);    
+
+    outPacket = packetProcessor->ReplaceDnsPort(&parsedPacket);    
 
     ASSERT_NE(outPacket, nullptr);
 

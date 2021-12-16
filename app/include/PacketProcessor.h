@@ -47,6 +47,8 @@ class PacketProcessor
     pcpp::Packet* FilterIpVersion(pcpp::Packet* parsedPacket);
     pcpp::Packet* ReduceTTL(pcpp::Packet* parsedPacket);
     pcpp::Packet* FilterICMP(pcpp::Packet* parsedPacket);
+    pcpp::Packet* ReplaceDnsAddress(pcpp::Packet* parsedPacket);
+    pcpp::Packet* ReplaceDnsPort(pcpp::Packet* parsedPacket);
     // public ProcessPacket(pcpp::RawPacket rawPacket);
 };
 

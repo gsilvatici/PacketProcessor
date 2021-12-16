@@ -181,3 +181,19 @@ pcpp::Packet* PacketProcessor::FilterICMP(pcpp::Packet* parsedPacket)
     }
     return nullptr;
 }
+
+pcpp::Packet* PacketProcessor::ReplaceDnsAddress(pcpp::Packet* parsedPacket)
+{
+    if(!parsedPacket->isPacketOfType(pcpp::ICMP)) {
+        return parsedPacket;
+    }
+    return nullptr;
+}
+
+pcpp::Packet* PacketProcessor::ReplaceDnsPort(pcpp::Packet* parsedPacket)
+{
+    if(!parsedPacket->isPacketOfType(pcpp::ICMP)) {
+        return parsedPacket;
+    }
+    return nullptr;
+}
