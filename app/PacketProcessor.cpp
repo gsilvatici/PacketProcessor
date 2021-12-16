@@ -153,12 +153,31 @@ pcpp::Packet* PacketProcessor::FilterIpVersion(pcpp::Packet* parsedPacket)
 pcpp::Packet* PacketProcessor::ReduceTTL(pcpp::Packet* parsedPacket)
 {
     if (this->ReducesTTL()) {
-        pcpp::IPv4Layer* ipLayer = parsedPacket->getLayerOfType<pcpp::IPv4Layer>();
-        int packetTTL = ipLayer->getIPv4Header()->timeToLive;
-        // if (this->ttl > packetTTL) {
-              ipLayer->getIPv4Header()->timeToLive = packetTTL - this->ttl;
-              return parsedPacket;
-        // }
+        int packetTTL = 0;
+        if(parsedPacket->isPacketOfType(pcpp::IPv4)) {
+            pcpp::IPv4Layer* ipLayer = parsedPacket->getLayerOfType<pcpp::IPv4Layer>();
+            packetTTL = ipLayer->getIPv4Header()->timeToLive;
+            if (this->ttl < packetTTL) {
+                ipLayer->getIPv4Header()->timeToLive = packetTTL - this->ttl;
+                return parsedPacket;
+            }
+        }
+        if(parsedPacket->isPacketOfType(pcpp::IPv6)) {
+            pcpp::IPv6Layer* ipLayer = parsedPacket->getLayerOfType<pcpp::IPv6Layer>();
+            packetTTL = ipLayer->getIPv6Header()->hopLimit;
+            if (this->ttl < packetTTL) {
+                ipLayer->getIPv6Header()->hopLimit = packetTTL - this->ttl;
+                return parsedPacket;
+            } 
+        }
+    }
+    return nullptr;
+}
+
+pcpp::Packet* PacketProcessor::FilterICMP(pcpp::Packet* parsedPacket)
+{
+    if(!parsedPacket->isPacketOfType(pcpp::ICMP)) {
+        return parsedPacket;
     }
     return nullptr;
 }

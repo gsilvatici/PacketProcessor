@@ -7,6 +7,8 @@
 #include "Packet.h"
 #include "VlanLayer.h"
 #include "IPv4Layer.h"
+#include "IPv6Layer.h"
+// #include "ICMP.h"
 // #include <PcapPlusPlusVersion.h>
 // #include <SystemUtils.h>
 // #include "stdlib.h"
@@ -44,6 +46,7 @@ class PacketProcessor
     pcpp::Packet* FilterNonEthernet(pcpp::Packet* parsedPacket);
     pcpp::Packet* FilterIpVersion(pcpp::Packet* parsedPacket);
     pcpp::Packet* ReduceTTL(pcpp::Packet* parsedPacket);
+    pcpp::Packet* FilterICMP(pcpp::Packet* parsedPacket);
     // public ProcessPacket(pcpp::RawPacket rawPacket);
 };
 

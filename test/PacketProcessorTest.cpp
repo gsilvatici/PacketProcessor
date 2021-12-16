@@ -226,30 +226,76 @@ TEST(ReduceTTL, FromFileWithOnlyOneIPv4Packet)
 
     pcpp::IPv4Layer* ipLayer = outPacket->getLayerOfType<pcpp::IPv4Layer>();
     int packetTTL = ipLayer->getIPv4Header()->timeToLive;
-    
+
     ASSERT_EQ(packetTTL, 15);
 
     delete packetProcessor;
 }
 
-// TEST(PacketFiltering, PcapFileWithOnlyOneICMPPacket) 
-// {
-//     PacketProcessor* packetProcessor = new PacketProcessor();
-//     packetProcessor->InitializeReader("../scapySamples/test_sample.pcap");
+TEST(ReduceTTL, FromFileWithOnlyOneIPv6Packet) 
+{
+    PacketProcessor* packetProcessor = new PacketProcessor();
+    packetProcessor->setTTL(19);
+    packetProcessor->InitializeReader("../scapySamples/1_ipv6_packet.pcap");
 
-//     pcpp::IFileReaderDevice* reader = packetProcessor->getPacketReader();
+    pcpp::IFileReaderDevice* reader = packetProcessor->getPacketReader();
 
-//     pcpp::RawPacket rawPacket;
-// 	reader->getNextPacket(rawPacket);
+    pcpp::RawPacket rawPacket;
+	  reader->getNextPacket(rawPacket);
     
-//     pcpp::Packet parsedPacket(&rawPacket);
+    pcpp::Packet parsedPacket(&rawPacket);
 
-//     // pcpp::Packet* outPacket = outPacket = packetProcessor->FilterICMP(&parsedPacket);    
-   
-//     // ASSERT_NE(outPacket, nullptr);
+    pcpp::Packet* outPacket = nullptr;
 
-//     delete packetProcessor;
-// }
+    if (packetProcessor->ReducesTTL()) {
+        outPacket = packetProcessor->ReduceTTL(&parsedPacket);    
+    }
+
+    pcpp::IPv6Layer* ipLayer = outPacket->getLayerOfType<pcpp::IPv6Layer>();
+    int packetTTL = ipLayer->getIPv6Header()->hopLimit;
+
+    ASSERT_EQ(packetTTL, 1);
+
+    delete packetProcessor;
+}
+
+TEST(FilterICMPPacket, FromFileWithOnlyOneIPv4Packet) 
+{
+    PacketProcessor* packetProcessor = new PacketProcessor();
+    packetProcessor->InitializeReader("../scapySamples/1_ipv4_packet.pcap");
+
+    pcpp::IFileReaderDevice* reader = packetProcessor->getPacketReader();
+
+    pcpp::RawPacket rawPacket;
+	  reader->getNextPacket(rawPacket);
+    
+    pcpp::Packet parsedPacket(&rawPacket);
+
+    pcpp::Packet* outPacket = packetProcessor->FilterICMP(&parsedPacket);
+
+    ASSERT_NE(outPacket, nullptr);
+
+    delete packetProcessor;
+}
+
+TEST(FilterICMPPacket, FromFileWithOnlyOneICMPPacket) 
+{
+    PacketProcessor* packetProcessor = new PacketProcessor();
+    packetProcessor->InitializeReader("../scapySamples/1_icmp_packet.pcap");
+
+    pcpp::IFileReaderDevice* reader = packetProcessor->getPacketReader();
+
+    pcpp::RawPacket rawPacket;
+	  reader->getNextPacket(rawPacket);
+    
+    pcpp::Packet parsedPacket(&rawPacket);
+
+    pcpp::Packet* outPacket = packetProcessor->FilterICMP(&parsedPacket);
+
+    ASSERT_NE(outPacket, nullptr);
+
+    delete packetProcessor;
+}
 
 }
 
