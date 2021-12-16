@@ -81,10 +81,9 @@ std::string getProtocolTypeAsString(pcpp::ProtocolType protocolType)
  */
 int main(int argc, char* argv[])
 {
-    // printUsage();
     pcpp::AppName::init(argc, argv);
     //Get arguments from user for incoming interface and outgoing interface
-    std::string input_file = "", output_file = "";
+    std::string inputFile = "", outputFile = "";
     int optionIndex = 0;
     int opt = 0;
     uint16_t vlan_id = 0;
@@ -96,10 +95,10 @@ int main(int argc, char* argv[])
                 break;
             case 'i':
                         // printf(optarg);
-                input_file = optarg;
+                inputFile = optarg;
                 break;
             case 'o':
-                output_file = optarg;
+                outputFile = optarg;
                 break;
             case vlan:
                 if (OPTIONAL_ARGUMENT_IS_PRESENT) {
@@ -137,4 +136,31 @@ int main(int argc, char* argv[])
         }
     }
 
+    PacketProcessor packetProcessor = new PacketProcessor();
+
+    packetProcessor.initializeReader(inputFile);
+
+    packetProcessor.initializeWriter(outputFile);
+
+    pcpp::IFileReaderDevice* reader = pcpp::IFileReaderDevice::getReader(input_file);
+
+    pcpp::PcapFileWriterDevice pcapWriter(output_file, pcpp::LINKTYPE_ETHERNET);
+
+
+    while (reader->getNextPacket(rawPacket)) {
+          // parse the raw packet into a parsed packet
+          pcpp::Packet parsedPacket(&rawPacket);
+
+          pcpp::Packet* currentPacket = &parsedPacket;
+          
+          currentPacket = packetProcessor->FilterVlanId(currentPacket);
+          currentPacket = packetProcessor->FilterNonEthernet(currentPacket);
+          currentPacket = packetProcessor->FilterIpVersion(currentPacket);
+          currentPacket = packetProcessor->ReduceTTL(currentPacket);
+          currentPacket = packetProcessor->FilterICMP(currentPacket);
+          
+          pcapWriter.writePacket(currentPacket);          
+    }
+
+    delete packetProcessor;
 }
