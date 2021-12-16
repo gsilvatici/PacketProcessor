@@ -297,6 +297,33 @@ TEST(FilterICMPPacket, FromFileWithOnlyOneICMPPacket)
     delete packetProcessor;
 }
 
+TEST(ReplaceDnsAddress, FromFileWithOnlyOneTCPPacketWithDNSLayer) 
+{
+    PacketProcessor* packetProcessor = new PacketProcessor();
+    packetProcessor->setIpVersion(6);
+    packetProcessor->InitializeReader("../scapySamples/1_ipv6_packet.pcap");
+
+    pcpp::IFileReaderDevice* reader = packetProcessor->getPacketReader();
+
+    pcpp::RawPacket rawPacket;
+	  reader->getNextPacket(rawPacket);
+    
+    pcpp::Packet parsedPacket(&rawPacket);
+
+    pcpp::Packet* outPacket = nullptr;
+
+    if (packetProcessor->FiltersIpVersion()) {
+        outPacket = packetProcessor->FilterIpVersion(&parsedPacket);    
+    }
+
+    ASSERT_NE(outPacket, nullptr);
+
+    delete packetProcessor;
+}
+
+
+
+
 }
 
 int main(int argc, char **argv)

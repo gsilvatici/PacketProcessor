@@ -18,3 +18,6 @@ wrpcap('1_ipv6_packet.pcap', [packet])
 
 packet = ICMP()
 wrpcap('1_icmp_packet.pcap', [packet])
+
+packet = Ether() / IP(dst="1.2.3.4") / TCP(dport=123) / 
+wrpcap('1_tcp_dns_packet.pcap', [packet])

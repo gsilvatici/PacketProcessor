@@ -21,15 +21,15 @@ enum { def, vlan, ip_version, ttl, dns_addr, dns_port };
 
 static struct option ArgOptions[] =
 {
-	{"input",      required_argument, 0, 'i'},
-	{"output",     required_argument, 0, 'o'},
+    {"input",      required_argument, 0, 'i'},
+    {"output",     required_argument, 0, 'o'},
     {"vlan",       optional_argument, 0, vlan},
     {"ip-version", optional_argument, 0, ip_version},
     {"ttl",        optional_argument, 0, ttl},
     {"dns-addr",   optional_argument, 0, dns_addr},
-	{"dns-addr",   optional_argument, 0, dns_port},
+    {"dns-addr",   optional_argument, 0, dns_port},
     {"help",       no_argument,       0, 'h'},
-	{0, 0, 0, 0}
+    {0, 0, 0, 0}
 };
 
 /**
@@ -38,24 +38,24 @@ static struct option ArgOptions[] =
 void printUsage()
 {
     std::cout << std::endl
-		<< "Usage:" << std::endl
-		<< "------" << std::endl
-		<< "pcap-convert [-h] -i input -o output " << std::endl
-		<< std::endl
-		<< "Required parameters:" << std::endl
-		<< std::endl
-		<< "    -i: Path of the input pcap file" << std::endl
-		<< "    -o: Path of the input pcap file" << std::endl
-		<< std::endl
-        << "Optional parameters:" << std::endl
-        << std::endl
-		<< "    --vlan            : Drop packets that are not in the vlan id value specified" << std::endl
-		<< "    --ip-version      : Drop packets that are not in the same ip-version" << std::endl
-		<< "    --ttl             : Value to decrease the TTL of a packet that is not on IPv4 or IPv6" << std::endl
-		<< "    --dns-addr        : DNS address to be replaced in a UDP packet with DNS layer" << std::endl
-		<< "    --dns-port        : DNS port to be replaced in in a UDP packet with DNS layer" << std::endl
-        << "    -h                : Displays this help message and exits" << std::endl
-        << std::endl;
+    << "Usage:" << std::endl
+    << "------" << std::endl
+    << "pcap-convert [-h] -i input -o output " << std::endl
+    << std::endl
+    << "Required parameters:" << std::endl
+    << std::endl
+    << "    -i: Path of the input pcap file" << std::endl
+    << "    -o: Path of the input pcap file" << std::endl
+    << std::endl
+    << "Optional parameters:" << std::endl
+    << std::endl
+    << "    --vlan            : Drop packets that are not in the vlan id value specified" << std::endl
+    << "    --ip-version      : Drop packets that are not in the same ip-version" << std::endl
+    << "    --ttl             : Value to decrease the TTL of a packet that is not on IPv4 or IPv6" << std::endl
+    << "    --dns-addr        : DNS address to be replaced in a UDP packet with DNS layer" << std::endl
+    << "    --dns-port        : DNS port to be replaced in in a UDP packet with DNS layer" << std::endl
+    << "    -h                : Displays this help message and exits" << std::endl
+    << std::endl;
 }
 
 std::string getProtocolTypeAsString(pcpp::ProtocolType protocolType)
@@ -83,108 +83,58 @@ int main(int argc, char* argv[])
 {
     // printUsage();
     pcpp::AppName::init(argc, argv);
-	//Get arguments from user for incoming interface and outgoing interface
-	std::string input_file = "", output_file = "";
-	int optionIndex = 0;
-	int opt = 0;
+    //Get arguments from user for incoming interface and outgoing interface
+    std::string input_file = "", output_file = "";
+    int optionIndex = 0;
+    int opt = 0;
     uint16_t vlan_id = 0;
-	while((opt = getopt_long_only(argc, argv, "i:o:", ArgOptions, &optionIndex)) != -1)
-	{
-		switch (opt)
-		{
-			case 0:
-				break;
-			case 'i':
-                printf(optarg);
-				input_file = optarg;
-				break;
-			case 'o':
-				output_file = optarg;
-				break;
-			case vlan:
-                if (OPTIONAL_ARGUMENT_IS_PRESENT)
-                {
+    while((opt = getopt_long_only(argc, argv, "i:o:", ArgOptions, &optionIndex)) != -1)
+    {
+        switch (opt)
+        {
+            case 0:
+                break;
+            case 'i':
+                        // printf(optarg);
+                input_file = optarg;
+                break;
+            case 'o':
+                output_file = optarg;
+                break;
+            case vlan:
+                if (OPTIONAL_ARGUMENT_IS_PRESENT) {
                     vlan_id = atoi(optarg);
                     printf(" %d", vlan_id);
                 }
-				break;
+                break;
             case ip_version:
-                if (OPTIONAL_ARGUMENT_IS_PRESENT)
-                {
+                if (OPTIONAL_ARGUMENT_IS_PRESENT) { 
 
                 }
-				break;
-			case ttl:
-                if (OPTIONAL_ARGUMENT_IS_PRESENT)
-                {
+                break;
+            case ttl:
+                if (OPTIONAL_ARGUMENT_IS_PRESENT) {
 
                 }
-				break;
-			case dns_addr:
-                if (OPTIONAL_ARGUMENT_IS_PRESENT)
-                {
+                break;
+            case dns_addr:
+                if (OPTIONAL_ARGUMENT_IS_PRESENT) {
 
                 }
-				break;
-			case dns_port:
-                if (OPTIONAL_ARGUMENT_IS_PRESENT)
-                {
+                break;
+            case dns_port:
+                if (OPTIONAL_ARGUMENT_IS_PRESENT) {
 
                 }
-				break;
-			case 'h':
-				printUsage();
-				exit(0);
-				break;
-			default:
-				printUsage();
-				exit(-1);
-		}
-	}
-
-	// use the IFileReaderDevice interface to automatically identify file type (pcap/pcap-ng)
-	// and create an interface instance that both readers implement
-	pcpp::IFileReaderDevice* reader = pcpp::IFileReaderDevice::getReader(input_file);
-
-    // puts(input_file);
-    // std::cout << output_file << std::endl;
-
-	// verify that a reader interface was indeed created
-	if (reader == NULL)
-	{
-		std::cerr << "Cannot determine reader for file type" << std::endl;
-		return 1;
-	}
-
-	// open the reader for reading
-	if (!reader->open())
-	{
-		std::cerr << "Cannot open input.pcap for reading" << std::endl;
-		return 1;
-	}
-
-	// create a pcap file writer. Specify file name and link type of all packets that
-	// will be written to it
-	pcpp::PcapFileWriterDevice pcapWriter(output_file, pcpp::LINKTYPE_ETHERNET);
-
-	// try to open the file for writing
-	if (!pcapWriter.open())
-	{
-		std::cerr << "Cannot open output.pcap for writing" << std::endl;
-		return 1;
-	}
-
-	// the packet container
-	pcpp::RawPacket rawPacket;
-
-	// a while loop that will continue as long as there are packets in the input file
-	// matching the BPF filter
-	while (reader->getNextPacket(rawPacket))
-	{
-        // parse the raw packet into a parsed packet
-        pcpp::Packet parsedPacket(&rawPacket);
-
-        pcpp::Layer* curLayer = parsedPacket.getFirstLayer();
-	}
+                break;
+            case 'h':
+                printUsage();
+                exit(0);
+                break;
+            default:
+                printUsage();
+                exit(-1);
+        }
+    }
 
 }
