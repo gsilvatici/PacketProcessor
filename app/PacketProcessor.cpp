@@ -20,22 +20,46 @@ PacketProcessor::PacketProcessor(int vlanId, int ipVersion, int ttl, int dnsAddr
     this->dnsPort =    dnsPort;
     this->reader =  nullptr;
     this->writer =  nullptr;
-    }
+}
 
 PacketProcessor::~PacketProcessor()
 {
-    if(this->reader != nullptr) 
-    {
+    if(this->reader != nullptr) {
         reader->close();
         delete reader;
     }
         
-    if(this->writer != nullptr) 
-    {
+    if(this->writer != nullptr) {
         writer->close();
         delete writer;
     }
 }
+
+void PacketProcessor::setVlanId(int vlanId)
+{
+    this->vlanId = vlanId;
+}
+
+void PacketProcessor::setIpVersion(int ipVersion)
+{
+    this->ipVersion = ipVersion;
+}
+
+void PacketProcessor::setTTL(int ttl)
+{
+    this->ttl = ttl;
+}
+
+void PacketProcessor::setDnsAddress(int dnsAddress)
+{
+    this->dnsAddress = dnsAddress;
+}
+
+void PacketProcessor::setDnsPort(int dnsPort)
+{
+    this->dnsPort = dnsPort;
+}
+
 
 bool PacketProcessor::FiltersByVLAN()
 {
@@ -65,17 +89,18 @@ bool PacketProcessor::ReplacesDnsPort()
 bool PacketProcessor::InitializeReader(std::string inputFile)
 {
     reader = pcpp::IFileReaderDevice::getReader(inputFile);
-    if (reader != nullptr)
-    {
+    if (reader != nullptr) {
         return reader->open();
     } else {
         return false;        
     }   
 }
 
-void PacketProcessor::InitializeWriter(std::string outputFile)
+bool PacketProcessor::InitializeWriter(std::string outputFile)
 {
     writer = new pcpp::PcapFileWriterDevice(outputFile, pcpp::LINKTYPE_ETHERNET);
+
+    return writer->open();
 }
 
 pcpp::IFileReaderDevice* PacketProcessor::getPacketReader()
@@ -90,28 +115,19 @@ pcpp::PcapFileWriterDevice* PacketProcessor::getPacketWriter()
 
 pcpp::Packet* PacketProcessor::FilterNonEthernet(pcpp::Packet* parsedPacket)
 {
-    pcpp::Layer* curLayer = parsedPacket->getFirstLayer();
-
-    // return parsedPacket;
-    if (curLayer->getProtocol() != pcpp::Ethernet)
-    {
-        return nullptr;
-    } else {
+    if(parsedPacket->isPacketOfType(pcpp::Ethernet)) {
         return parsedPacket;
     }
+
+    return nullptr;
 }
 
 pcpp::Packet* PacketProcessor::FilterByIpVersion(pcpp::Packet* parsedPacket)
 {
-    for (pcpp::Layer* curLayer = parsedPacket->getFirstLayer(); curLayer != NULL; curLayer = curLayer->getNextLayer())
-    {
-        if (curLayer->getProtocol() == pcpp::Ethernet)
-        {
-                return nullptr;
-        } else 
-        {
-                return parsedPacket;
-        }
+    if ((this->ipVersion == 4 && parsedPacket->isPacketOfType(pcpp::IPv4)) ||
+        (this->ipVersion == 6 && parsedPacket->isPacketOfType(pcpp::IPv6))) {
+          return parsedPacket;
     }
-    return parsedPacket;
+
+    return nullptr;
 }
