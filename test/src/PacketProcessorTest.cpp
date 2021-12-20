@@ -1,4 +1,4 @@
-#include "../../app/include/PacketProcessor.h"
+#include "../../app/include/pp/PacketProcessor.h"
 #include "gtest/gtest.h"
 
 namespace
@@ -23,7 +23,7 @@ class PacketProcessorTest : public ::testing::Test
 TEST(Initializer, InitializeReader)
 {
     PacketProcessor* packetProcessor = new PacketProcessor();
-    bool initStatus = packetProcessor->InitializeReader("../test/data/capture/single_packet_pcaps/eth_packet.pcap");
+    bool initStatus = packetProcessor->initializeReader("../test/data/capture/single_packet_pcaps/eth_packet.pcap");
 
     ASSERT_EQ(initStatus, true);
 
@@ -33,7 +33,7 @@ TEST(Initializer, InitializeReader)
 TEST(Initializer, InitializeWriter) 
 {
     PacketProcessor* packetProcessor = new PacketProcessor();
-    bool initStatus = packetProcessor->InitializeWriter("out_file.pcap");
+    bool initStatus = packetProcessor->initializeWriter("out_file.pcap");
 
     ASSERT_EQ(initStatus, true);
 
@@ -43,8 +43,9 @@ TEST(Initializer, InitializeWriter)
 TEST(FilterPacketWithVlanIdNotEqual23, DISABLED_FromFileWithOnlyOnePacketAndDistinctId) 
 {
     PacketProcessor* packetProcessor = new PacketProcessor();
-    packetProcessor->setVlanId(23);
-    packetProcessor->InitializeReader("../test/data/capture/single_packet_pcaps/ipv4_packet_bis.pcap");
+    uint16_t vlanId = 23;
+    packetProcessor->setVlanId(vlanId);
+    packetProcessor->initializeReader("../test/data/capture/single_packet_pcaps/ipv4_packet_bis.pcap");
 
     pcpp::IFileReaderDevice* reader = packetProcessor->getPacketReader();
 
@@ -52,7 +53,7 @@ TEST(FilterPacketWithVlanIdNotEqual23, DISABLED_FromFileWithOnlyOnePacketAndDist
 	  reader->getNextPacket(rawPacket);
     pcpp::Packet parsedPacket(&rawPacket);
     
-    pcpp::Packet* outPacket = packetProcessor->FilterVlanId(&parsedPacket);
+    pcpp::Packet* outPacket = packetProcessor->filterVlanId(&parsedPacket);
 
     ASSERT_EQ(outPacket, nullptr);
 
@@ -63,14 +64,14 @@ TEST(FilterPacketWithVlanIdNotEqual23, DISABLED_FromFileWithOnlyOnePacketAndSame
 {
     PacketProcessor* packetProcessor = new PacketProcessor();
     packetProcessor->setVlanId(23);
-    packetProcessor->InitializeReader("../test/data/capture/single_packet_pcaps/ipv4_packet.pcap");
+    packetProcessor->initializeReader("../test/data/capture/single_packet_pcaps/ipv4_packet.pcap");
 
     pcpp::IFileReaderDevice* reader = packetProcessor->getPacketReader();
 
     pcpp::RawPacket rawPacket;
 	  reader->getNextPacket(rawPacket);
     pcpp::Packet parsedPacket(&rawPacket);
-    pcpp::Packet* outPacket = packetProcessor->FilterVlanId(&parsedPacket);
+    pcpp::Packet* outPacket = packetProcessor->filterVlanId(&parsedPacket);
   
     ASSERT_NE(outPacket, nullptr);
 
@@ -80,7 +81,7 @@ TEST(FilterPacketWithVlanIdNotEqual23, DISABLED_FromFileWithOnlyOnePacketAndSame
 TEST(FilterEthernetPacket, FromFileWithOnlyOneEthernetPacket) 
 {
     PacketProcessor* packetProcessor = new PacketProcessor();
-    packetProcessor->InitializeReader("../test/data/capture/single_packet_pcaps/eth_packet.pcap");
+    packetProcessor->initializeReader("../test/data/capture/single_packet_pcaps/eth_packet.pcap");
 
     pcpp::IFileReaderDevice* reader = packetProcessor->getPacketReader();
 
@@ -89,7 +90,7 @@ TEST(FilterEthernetPacket, FromFileWithOnlyOneEthernetPacket)
     
     pcpp::Packet parsedPacket(&rawPacket);
 
-    pcpp::Packet* outPacket = packetProcessor->FilterNonEthernet(&parsedPacket);
+    pcpp::Packet* outPacket = packetProcessor->filterNonEthernet(&parsedPacket);
     
     //Since it is a ethernet packet it should not filter it and return it back
     ASSERT_NE(outPacket, nullptr);
@@ -100,7 +101,7 @@ TEST(FilterEthernetPacket, FromFileWithOnlyOneEthernetPacket)
 TEST(FilterEthernetPacket, FromFileWithOnlyOneNonEthernetPacket) 
 {
     PacketProcessor* packetProcessor = new PacketProcessor();
-    packetProcessor->InitializeReader("../test/data/capture/single_packet_pcaps/ppp_packet.pcap");
+    packetProcessor->initializeReader("../test/data/capture/single_packet_pcaps/ppp_packet.pcap");
 
     pcpp::IFileReaderDevice* reader = packetProcessor->getPacketReader();
     pcpp::RawPacket rawPacket;
@@ -108,7 +109,7 @@ TEST(FilterEthernetPacket, FromFileWithOnlyOneNonEthernetPacket)
     pcpp::Packet parsedPacket(&rawPacket);
 
     //Since it is not an ethernet packet (is a PPP) it should filter it and return null
-    pcpp::Packet* outPacket = packetProcessor->FilterNonEthernet(&parsedPacket);
+    pcpp::Packet* outPacket = packetProcessor->filterNonEthernet(&parsedPacket);
     
     ASSERT_EQ(outPacket, nullptr);
 
@@ -118,8 +119,8 @@ TEST(FilterEthernetPacket, FromFileWithOnlyOneNonEthernetPacket)
 TEST(FilterIPv6Packet, FromFileWithOnlyOneIPv4Packet) 
 {
     PacketProcessor* packetProcessor = new PacketProcessor();
-    packetProcessor->setIpVersion(4);
-    packetProcessor->InitializeReader("../test/data/capture/single_packet_pcaps/ipv4_packet.pcap");
+    packetProcessor->setIpVersion((uint8_t)4);
+    packetProcessor->initializeReader("../test/data/capture/single_packet_pcaps/ipv4_packet.pcap");
 
     pcpp::IFileReaderDevice* reader = packetProcessor->getPacketReader();
 
@@ -128,8 +129,8 @@ TEST(FilterIPv6Packet, FromFileWithOnlyOneIPv4Packet)
     pcpp::Packet parsedPacket(&rawPacket);
     pcpp::Packet* outPacket = nullptr;
 
-    if (packetProcessor->FiltersIpVersion()) {
-        outPacket = packetProcessor->FilterIpVersion(&parsedPacket);    
+    if (packetProcessor->filtersIpVersion()) {
+        outPacket = packetProcessor->filterIpVersion(&parsedPacket);    
     }
 
     ASSERT_NE(outPacket, nullptr);
@@ -140,8 +141,8 @@ TEST(FilterIPv6Packet, FromFileWithOnlyOneIPv4Packet)
 TEST(FilterIPv6Packet, FromFileWithOnlyOneIPv6Packet) 
 {
     PacketProcessor* packetProcessor = new PacketProcessor();
-    packetProcessor->setIpVersion(4);
-    packetProcessor->InitializeReader("../test/data/capture/single_packet_pcaps/ipv6_packet.pcap");
+    packetProcessor->setIpVersion((uint8_t)4);
+    packetProcessor->initializeReader("../test/data/capture/single_packet_pcaps/ipv6_packet.pcap");
 
     pcpp::IFileReaderDevice* reader = packetProcessor->getPacketReader();
 
@@ -150,8 +151,8 @@ TEST(FilterIPv6Packet, FromFileWithOnlyOneIPv6Packet)
     pcpp::Packet parsedPacket(&rawPacket);
     pcpp::Packet* outPacket = nullptr;
 
-    if (packetProcessor->FiltersIpVersion()) {
-        outPacket = packetProcessor->FilterIpVersion(&parsedPacket);    
+    if (packetProcessor->filtersIpVersion()) {
+        outPacket = packetProcessor->filterIpVersion(&parsedPacket);    
     }
 
     ASSERT_EQ(outPacket, nullptr);
@@ -162,8 +163,8 @@ TEST(FilterIPv6Packet, FromFileWithOnlyOneIPv6Packet)
 TEST(FilterIPv4Packet, FromFileWithOnlyOneIPv4Packet) 
 {
     PacketProcessor* packetProcessor = new PacketProcessor();
-    packetProcessor->setIpVersion(6);
-    packetProcessor->InitializeReader("../test/data/capture/single_packet_pcaps/ipv4_packet.pcap");
+    packetProcessor->setIpVersion((uint8_t)6);
+    packetProcessor->initializeReader("../test/data/capture/single_packet_pcaps/ipv4_packet.pcap");
 
     pcpp::IFileReaderDevice* reader = packetProcessor->getPacketReader();
 
@@ -172,8 +173,8 @@ TEST(FilterIPv4Packet, FromFileWithOnlyOneIPv4Packet)
     pcpp::Packet parsedPacket(&rawPacket);
     pcpp::Packet* outPacket = nullptr;
 
-    if (packetProcessor->FiltersIpVersion()) {
-        outPacket = packetProcessor->FilterIpVersion(&parsedPacket);    
+    if (packetProcessor->filtersIpVersion()) {
+        outPacket = packetProcessor->filterIpVersion(&parsedPacket);    
     }
 
     ASSERT_EQ(outPacket, nullptr);
@@ -184,8 +185,8 @@ TEST(FilterIPv4Packet, FromFileWithOnlyOneIPv4Packet)
 TEST(FilterIPv4Packet, FromFileWithOnlyOneIPv6Packet) 
 {
     PacketProcessor* packetProcessor = new PacketProcessor();
-    packetProcessor->setIpVersion(6);
-    packetProcessor->InitializeReader("../test/data/capture/single_packet_pcaps/ipv6_packet.pcap");
+    packetProcessor->setIpVersion((uint8_t)6);
+    packetProcessor->initializeReader("../test/data/capture/single_packet_pcaps/ipv6_packet.pcap");
 
     pcpp::IFileReaderDevice* reader = packetProcessor->getPacketReader();
 
@@ -196,8 +197,8 @@ TEST(FilterIPv4Packet, FromFileWithOnlyOneIPv6Packet)
 
     pcpp::Packet* outPacket = nullptr;
 
-    if (packetProcessor->FiltersIpVersion()) {
-        outPacket = packetProcessor->FilterIpVersion(&parsedPacket);    
+    if (packetProcessor->filtersIpVersion()) {
+        outPacket = packetProcessor->filterIpVersion(&parsedPacket);    
     }
 
     ASSERT_NE(outPacket, nullptr);
@@ -209,7 +210,7 @@ TEST(ReduceTTL, FromFileWithOnlyOneIPv4Packet)
 {
     PacketProcessor* packetProcessor = new PacketProcessor();
     packetProcessor->setTTL(5);
-    packetProcessor->InitializeReader("../test/data/capture/single_packet_pcaps/ipv4_packet.pcap");
+    packetProcessor->initializeReader("../test/data/capture/single_packet_pcaps/ipv4_packet.pcap");
 
     pcpp::IFileReaderDevice* reader = packetProcessor->getPacketReader();
 
@@ -220,8 +221,8 @@ TEST(ReduceTTL, FromFileWithOnlyOneIPv4Packet)
 
     pcpp::Packet* outPacket = nullptr;
 
-    if (packetProcessor->ReducesTTL()) {
-        outPacket = packetProcessor->ReduceTTL(&parsedPacket);    
+    if (packetProcessor->reducesTTL()) {
+        outPacket = packetProcessor->reduceTTL(&parsedPacket);    
     }
 
     pcpp::IPv4Layer* ipLayer = outPacket->getLayerOfType<pcpp::IPv4Layer>();
@@ -236,7 +237,7 @@ TEST(ReduceTTL, FromFileWithOnlyOneIPv6Packet)
 {
     PacketProcessor* packetProcessor = new PacketProcessor();
     packetProcessor->setTTL(19);
-    packetProcessor->InitializeReader("../test/data/capture/single_packet_pcaps/ipv6_packet.pcap");
+    packetProcessor->initializeReader("../test/data/capture/single_packet_pcaps/ipv6_packet.pcap");
 
     pcpp::IFileReaderDevice* reader = packetProcessor->getPacketReader();
 
@@ -247,8 +248,8 @@ TEST(ReduceTTL, FromFileWithOnlyOneIPv6Packet)
 
     pcpp::Packet* outPacket = nullptr;
 
-    if (packetProcessor->ReducesTTL()) {
-        outPacket = packetProcessor->ReduceTTL(&parsedPacket);    
+    if (packetProcessor->reducesTTL()) {
+        outPacket = packetProcessor->reduceTTL(&parsedPacket);    
     }
 
     pcpp::IPv6Layer* ipLayer = outPacket->getLayerOfType<pcpp::IPv6Layer>();
@@ -262,7 +263,7 @@ TEST(ReduceTTL, FromFileWithOnlyOneIPv6Packet)
 TEST(FilterICMPPacket, FromFileWithOnlyOneIPv4Packet) 
 {
     PacketProcessor* packetProcessor = new PacketProcessor();
-    packetProcessor->InitializeReader("../test/data/capture/single_packet_pcaps/ipv4_packet.pcap");
+    packetProcessor->initializeReader("../test/data/capture/single_packet_pcaps/ipv4_packet.pcap");
 
     pcpp::IFileReaderDevice* reader = packetProcessor->getPacketReader();
 
@@ -271,7 +272,7 @@ TEST(FilterICMPPacket, FromFileWithOnlyOneIPv4Packet)
     
     pcpp::Packet parsedPacket(&rawPacket);
 
-    pcpp::Packet* outPacket = packetProcessor->FilterICMP(&parsedPacket);
+    pcpp::Packet* outPacket = packetProcessor->filterICMP(&parsedPacket);
 
     ASSERT_NE(outPacket, nullptr);
 
@@ -281,7 +282,7 @@ TEST(FilterICMPPacket, FromFileWithOnlyOneIPv4Packet)
 TEST(FilterICMPPacket, FromFileWithOnlyOneICMPPacket) 
 {
     PacketProcessor* packetProcessor = new PacketProcessor();
-    packetProcessor->InitializeReader("../test/data/capture/single_packet_pcaps/icmp_packet.pcap");
+    packetProcessor->initializeReader("../test/data/capture/single_packet_pcaps/icmp_packet.pcap");
 
     pcpp::IFileReaderDevice* reader = packetProcessor->getPacketReader();
 
@@ -290,7 +291,7 @@ TEST(FilterICMPPacket, FromFileWithOnlyOneICMPPacket)
     
     pcpp::Packet parsedPacket(&rawPacket);
 
-    pcpp::Packet* outPacket = packetProcessor->FilterICMP(&parsedPacket);
+    pcpp::Packet* outPacket = packetProcessor->filterICMP(&parsedPacket);
 
     ASSERT_NE(outPacket, nullptr);
 
@@ -301,7 +302,7 @@ TEST(ReplaceDnsAddressAndPort, DISABLED_FromFileWithOnlyOneTCPPacketWithDNSLayer
 {
     PacketProcessor* packetProcessor = new PacketProcessor();
     // packetProcessor->setDnsAddress();
-    packetProcessor->InitializeReader("../test/data/capture/single_packet_pcaps/ipv6_packet.pcap");
+    packetProcessor->initializeReader("../test/data/capture/single_packet_pcaps/ipv6_packet.pcap");
 
     pcpp::IFileReaderDevice* reader = packetProcessor->getPacketReader();
 
@@ -312,9 +313,9 @@ TEST(ReplaceDnsAddressAndPort, DISABLED_FromFileWithOnlyOneTCPPacketWithDNSLayer
 
     pcpp::Packet* outPacket = nullptr;
 
-    outPacket = packetProcessor->ReplaceDnsAddress(&parsedPacket);    
+    outPacket = packetProcessor->replaceDnsAddress(&parsedPacket);    
 
-    outPacket = packetProcessor->ReplaceDnsPort(&parsedPacket);    
+    outPacket = packetProcessor->replaceDnsPort(&parsedPacket);    
 
     ASSERT_NE(outPacket, nullptr);
 

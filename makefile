@@ -11,8 +11,8 @@ all: test
 
 test: $(OBJECTS)
 	$(CXX) $(LXXFLAGS) -o $(TESTN) $(OBJECTS) $(GTEST) $(PCAPPP_LIBS)
-./build/PacketProcessor.o: ./app/src/PacketProcessor.cpp
-	$(CXX) $(CXXFLAGS) ./app/src/PacketProcessor.cpp -o ./build/PacketProcessor.o
+./build/PacketProcessor.o: ./app/src/pp/PacketProcessor.cpp
+	$(CXX) $(CXXFLAGS) ./app/src/pp/PacketProcessor.cpp -o ./build/PacketProcessor.o
 ./build/PacketProcessorTest.o: ./test/src/PacketProcessorTest.cpp
 	$(CXX) $(CXXFLAGS) ./test/src/PacketProcessorTest.cpp -o ./build/PacketProcessorTest.o
 clean:
