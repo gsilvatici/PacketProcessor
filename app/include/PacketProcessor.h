@@ -8,10 +8,7 @@
 #include "VlanLayer.h"
 #include "IPv4Layer.h"
 #include "IPv6Layer.h"
-// #include "ICMP.h"
-// #include <PcapPlusPlusVersion.h>
-// #include <SystemUtils.h>
-// #include "stdlib.h"
+#include "DnsLayer.h"
 
 class PacketProcessor
 {
