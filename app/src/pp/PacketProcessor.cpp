@@ -12,23 +12,17 @@ PacketProcessor::PacketProcessor()
 }
 
 PacketProcessor::PacketProcessor(uint16_t vlanId, uint8_t ipVersion, uint8_t ttl, pcpp::IPAddress* dnsAddress, uint16_t dnsPort)
+    : vlanId(vlanId), ipVersion(ipVersion), ttl(ttl), dnsAddress(dnsAddress), dnsPort(dnsPort), reader(nullptr), writer(nullptr)
 {
-    this->vlanId = vlanId;
-    this->ipVersion = ipVersion;
-    this->ttl = ttl;
-    this->dnsAddress = dnsAddress;
-    this->dnsPort = dnsPort;
-    this->reader = nullptr;
-    this->writer = nullptr;
 }
 
 PacketProcessor::~PacketProcessor()
 {
-    if(this->reader != nullptr) {
+    if(reader) {
         reader->close();
         delete reader;
     }   
-    if(this->writer != nullptr) {
+    if(writer) {
         writer->close();
         delete writer;
     }
