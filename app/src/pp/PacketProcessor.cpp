@@ -112,12 +112,11 @@ pcpp::PcapFileWriterDevice* PacketProcessor::getPacketWriter()
 pcpp::Packet* PacketProcessor::filterVlanId(pcpp::Packet* parsedPacket)
 {
     if (this->filtersVLAN()) {
-        pcpp::VlanLayer* vlanLayer = parsedPacket->getLayerOfType<pcpp::VlanLayer>();
-        // vlanLayer->getVlanID();
-        if (vlanLayer == NULL)
-        {
-            std::cerr << "Something went wrong, couldn't find IPv4 layer" << std::endl;
-        }
+        auto vlanLayer = parsedPacket->getLayerOfType<pcpp::VlanLayer>();
+        // if (vlanLayer == NULL)
+        // {
+        //     std::cerr << "Something went wrong, couldn't find IPv4 layer" << std::endl;
+        // }
         if (this->vlanId == vlanLayer->getVlanID()) {
               return parsedPacket;
         }
@@ -147,20 +146,17 @@ pcpp::Packet* PacketProcessor::filterIpVersion(pcpp::Packet* parsedPacket)
 pcpp::Packet* PacketProcessor::reduceTTL(pcpp::Packet* parsedPacket)
 {
     if (this->reducesTTL()) {
-        int packetTTL = 0;
         if(parsedPacket->isPacketOfType(pcpp::IPv4)) {
-            pcpp::IPv4Layer* ipLayer = parsedPacket->getLayerOfType<pcpp::IPv4Layer>();
-            packetTTL = ipLayer->getIPv4Header()->timeToLive;
-            if (this->ttl < packetTTL) {
-                ipLayer->getIPv4Header()->timeToLive = packetTTL - this->ttl;
+            auto ipLayer = parsedPacket->getLayerOfType<pcpp::IPv4Layer>();
+            if (this->ttl < ipLayer->getIPv4Header()->timeToLive) {
+                ipLayer->getIPv4Header()->timeToLive -= this->ttl;
                 return parsedPacket;
             }
         }
         if(parsedPacket->isPacketOfType(pcpp::IPv6)) {
-            pcpp::IPv6Layer* ipLayer = parsedPacket->getLayerOfType<pcpp::IPv6Layer>();
-            packetTTL = ipLayer->getIPv6Header()->hopLimit;
-            if (this->ttl < packetTTL) {
-                ipLayer->getIPv6Header()->hopLimit = packetTTL - this->ttl;
+            auto ipLayer = parsedPacket->getLayerOfType<pcpp::IPv6Layer>();
+            if (this->ttl < ipLayer->getIPv6Header()->hopLimit) {
+                ipLayer->getIPv6Header()->hopLimit -= this->ttl;
                 return parsedPacket;
             } 
         }
@@ -187,34 +183,8 @@ pcpp::Packet* PacketProcessor::replaceDnsAddress(pcpp::Packet* parsedPacket)
 pcpp::Packet* PacketProcessor::replaceDnsPort(pcpp::Packet* parsedPacket)
 {    
     if (this->replacesDnsPort()) {
-        // reverse src and dst IP addresses
-        // pcpp::IPLayer* ipLayer = parsedPacket->getLayerOfType<pcpp::IPLayer>();
-        // pcpp::IPAddress srcIP = ipLayer->getSrcIPAddress();
-        // pcpp::IPv4Layer* ip4Layer = dynamic_cast<pcpp::IPv4Layer*>(ipLayer);
-        // pcpp::IPv6Layer* ip6Layer = dynamic_cast<pcpp::IPv6Layer*>(ipLayer);
-        // if (ip4Layer != NULL)
-        // {
-        //   ip4Layer->setSrcIPv4Address(ip4Layer->getDstIPv4Address());
-        //   ip4Layer->setDstIPv4Address(srcIP.getIPv4());
-        //   ip4Layer->getIPv4Header()->ipId = 0;
-        // }
-        // else
-        // {
-        //   ip6Layer->setSrcIPv6Address(ip6Layer->getDstIPv6Address());
-        //   ip6Layer->setDstIPv6Address(srcIP.getIPv6());
-        // }
-
-        // // reverse src and dst UDP ports
-        // uint16_t srcPort = udpLayer->getUdpHeader()->portSrc;
-        // udpLayer->getUdpHeader()->portSrc = udpLayer->getUdpHeader()->portDst;
-        // udpLayer->getUdpHeader()->portDst = srcPort;
-
-  
         if(parsedPacket->isPacketOfType(pcpp::UDP) && parsedPacket->isPacketOfType(pcpp::DNS)) {
             // pcpp::DnsLayer* dnsLayer = parsedPacket->getLayerOfType<pcpp::DnsLayer>();
-            
-
-
             return parsedPacket;
         }
     }
