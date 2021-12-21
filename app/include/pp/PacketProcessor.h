@@ -1,5 +1,5 @@
-#ifndef GTEST_PACKETPROCESSOR_H_
-#define GTEST_PACKETPROCESSOR_H_
+#ifndef PACKETPROCESSOR_H_
+#define PACKETPROCESSOR_H_
 
 #include <iostream>
 
@@ -52,4 +52,4 @@ namespace pp
     };
 }
 
-#endif // GTEST_PACKETROCESSOR_H
+#endif // PACKETROCESSOR_H
