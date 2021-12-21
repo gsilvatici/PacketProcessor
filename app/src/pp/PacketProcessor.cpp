@@ -1,5 +1,7 @@
 #include "../../include/pp/PacketProcessor.h"
 
+using namespace pp;
+
 PacketProcessor::PacketProcessor()
 {
     this->vlanId = -1;

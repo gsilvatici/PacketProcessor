@@ -1,6 +1,8 @@
 #include "../../app/include/pp/PacketProcessor.h"
 #include "gtest/gtest.h"
 
+using namespace pp;
+
 namespace
 {
 class PacketProcessorTest : public ::testing::Test
@@ -129,9 +131,7 @@ TEST(FilterIPv6Packet, FromFileWithOnlyOneIPv4Packet)
     pcpp::Packet parsedPacket(&rawPacket);
     pcpp::Packet* outPacket = nullptr;
 
-    if (packetProcessor->filtersIpVersion()) {
-        outPacket = packetProcessor->filterIpVersion(&parsedPacket);    
-    }
+    outPacket = packetProcessor->filterIpVersion(&parsedPacket);    
 
     ASSERT_NE(outPacket, nullptr);
 
@@ -151,9 +151,7 @@ TEST(FilterIPv6Packet, FromFileWithOnlyOneIPv6Packet)
     pcpp::Packet parsedPacket(&rawPacket);
     pcpp::Packet* outPacket = nullptr;
 
-    if (packetProcessor->filtersIpVersion()) {
-        outPacket = packetProcessor->filterIpVersion(&parsedPacket);    
-    }
+    outPacket = packetProcessor->filterIpVersion(&parsedPacket);    
 
     ASSERT_EQ(outPacket, nullptr);
 
@@ -173,9 +171,7 @@ TEST(FilterIPv4Packet, FromFileWithOnlyOneIPv4Packet)
     pcpp::Packet parsedPacket(&rawPacket);
     pcpp::Packet* outPacket = nullptr;
 
-    if (packetProcessor->filtersIpVersion()) {
-        outPacket = packetProcessor->filterIpVersion(&parsedPacket);    
-    }
+    outPacket = packetProcessor->filterIpVersion(&parsedPacket);    
 
     ASSERT_EQ(outPacket, nullptr);
 
@@ -197,9 +193,7 @@ TEST(FilterIPv4Packet, FromFileWithOnlyOneIPv6Packet)
 
     pcpp::Packet* outPacket = nullptr;
 
-    if (packetProcessor->filtersIpVersion()) {
-        outPacket = packetProcessor->filterIpVersion(&parsedPacket);    
-    }
+    outPacket = packetProcessor->filterIpVersion(&parsedPacket);    
 
     ASSERT_NE(outPacket, nullptr);
 
@@ -221,9 +215,7 @@ TEST(ReduceTTL, FromFileWithOnlyOneIPv4Packet)
 
     pcpp::Packet* outPacket = nullptr;
 
-    if (packetProcessor->reducesTTL()) {
-        outPacket = packetProcessor->reduceTTL(&parsedPacket);    
-    }
+    outPacket = packetProcessor->reduceTTL(&parsedPacket);    
 
     pcpp::IPv4Layer* ipLayer = outPacket->getLayerOfType<pcpp::IPv4Layer>();
     int packetTTL = ipLayer->getIPv4Header()->timeToLive;
@@ -248,9 +240,7 @@ TEST(ReduceTTL, FromFileWithOnlyOneIPv6Packet)
 
     pcpp::Packet* outPacket = nullptr;
 
-    if (packetProcessor->reducesTTL()) {
-        outPacket = packetProcessor->reduceTTL(&parsedPacket);    
-    }
+    outPacket = packetProcessor->reduceTTL(&parsedPacket);    
 
     pcpp::IPv6Layer* ipLayer = outPacket->getLayerOfType<pcpp::IPv6Layer>();
     int packetTTL = ipLayer->getIPv6Header()->hopLimit;

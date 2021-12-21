@@ -58,27 +58,8 @@ void printUsage()
     << std::endl;
 }
 
-std::string getProtocolTypeAsString(pcpp::ProtocolType protocolType)
-{
-    switch (protocolType)
-    {
-    case pcpp::Ethernet:
-        return "Ethernet";
-    case pcpp::IPv4:
-        return "IPv4";
-    case pcpp::TCP:
-        return "TCP";
-    case pcpp::HTTPRequest:
-    case pcpp::HTTPResponse:
-        return "HTTP";
-    default:
-        return "Unknown";
-    }
-}
 
-/**
- * main method of the application
- */
+
 int main(int argc, char* argv[])
 {
     pcpp::AppName::init(argc, argv);
