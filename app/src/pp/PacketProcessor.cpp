@@ -1,7 +1,5 @@
-#include "../../include/pp/PacketProcessor.h"
-
-// #include "pp/PacketProcessor.h"
-
+// #include "../../include/pp/PacketProcessor.h"
+#include "pp/PacketProcessor.h"
 
 using namespace pp;
 
@@ -140,9 +138,20 @@ pcpp::Packet* PacketProcessor::filterNonEthernet(pcpp::Packet* parsedPacket)
 pcpp::Packet* PacketProcessor::filterIpVersion(pcpp::Packet* parsedPacket)
 {
     if (this->filtersIpVersion()) {
-        if ((this->ipVersion == 4 && parsedPacket->isPacketOfType(pcpp::IPv4)) ||
-            (this->ipVersion == 6 && parsedPacket->isPacketOfType(pcpp::IPv6))) {
-              return parsedPacket;
+        switch(this->ipVersion)
+            {
+            case 4:
+                if(parsedPacket->isPacketOfType(pcpp::IPv4))
+                    return parsedPacket;
+            break;
+
+            case 6:
+                if(parsedPacket->isPacketOfType(pcpp::IPv6))
+                    return parsedPacket;
+            break;
+        // if ((this->ipVersion == 4 && parsedPacket->isPacketOfType(pcpp::IPv4)) ||
+        //     (this->ipVersion == 6 && parsedPacket->isPacketOfType(pcpp::IPv6))) {
+        //       return parsedPacket;
         }
     }
     return nullptr;
