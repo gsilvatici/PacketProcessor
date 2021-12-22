@@ -203,7 +203,7 @@ TEST(FilterIPv4Packet, FromFileWithOnlyOneIPv6Packet)
 TEST(ReduceTTL, FromFileWithOnlyOneIPv4Packet) 
 {
     PacketProcessor* packetProcessor = new PacketProcessor();
-    packetProcessor->setTTL(5);
+    packetProcessor->setTtl(5);
     packetProcessor->initializeReader("../test/data/capture/single_packet_pcaps/ipv4_packet.pcap");
 
     pcpp::IFileReaderDevice* reader = packetProcessor->getPacketReader();
@@ -215,7 +215,7 @@ TEST(ReduceTTL, FromFileWithOnlyOneIPv4Packet)
 
     pcpp::Packet* outPacket = nullptr;
 
-    outPacket = packetProcessor->reduceTTL(&parsedPacket);    
+    outPacket = packetProcessor->reduceTtl(&parsedPacket);    
 
     pcpp::IPv4Layer* ipLayer = outPacket->getLayerOfType<pcpp::IPv4Layer>();
     int packetTTL = ipLayer->getIPv4Header()->timeToLive;
@@ -228,7 +228,7 @@ TEST(ReduceTTL, FromFileWithOnlyOneIPv4Packet)
 TEST(ReduceTTL, FromFileWithOnlyOneIPv6Packet) 
 {
     PacketProcessor* packetProcessor = new PacketProcessor();
-    packetProcessor->setTTL(19);
+    packetProcessor->setTtl(19);
     packetProcessor->initializeReader("../test/data/capture/single_packet_pcaps/ipv6_packet.pcap");
 
     pcpp::IFileReaderDevice* reader = packetProcessor->getPacketReader();
@@ -240,7 +240,7 @@ TEST(ReduceTTL, FromFileWithOnlyOneIPv6Packet)
 
     pcpp::Packet* outPacket = nullptr;
 
-    outPacket = packetProcessor->reduceTTL(&parsedPacket);    
+    outPacket = packetProcessor->reduceTtl(&parsedPacket);    
 
     pcpp::IPv6Layer* ipLayer = outPacket->getLayerOfType<pcpp::IPv6Layer>();
     int packetTTL = ipLayer->getIPv6Header()->hopLimit;
@@ -262,7 +262,7 @@ TEST(FilterICMPPacket, FromFileWithOnlyOneIPv4Packet)
     
     pcpp::Packet parsedPacket(&rawPacket);
 
-    pcpp::Packet* outPacket = packetProcessor->filterICMP(&parsedPacket);
+    pcpp::Packet* outPacket = packetProcessor->filterIcmp(&parsedPacket);
 
     ASSERT_NE(outPacket, nullptr);
 
@@ -281,7 +281,7 @@ TEST(FilterICMPPacket, FromFileWithOnlyOneICMPPacket)
     
     pcpp::Packet parsedPacket(&rawPacket);
 
-    pcpp::Packet* outPacket = packetProcessor->filterICMP(&parsedPacket);
+    pcpp::Packet* outPacket = packetProcessor->filterIcmp(&parsedPacket);
 
     ASSERT_NE(outPacket, nullptr);
 

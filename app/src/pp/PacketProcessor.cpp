@@ -1,5 +1,8 @@
 #include "../../include/pp/PacketProcessor.h"
 
+// #include "pp/PacketProcessor.h"
+
+
 using namespace pp;
 
 PacketProcessor::PacketProcessor()
@@ -40,7 +43,7 @@ void PacketProcessor::setIpVersion(uint8_t ipVersion)
     this->ipVersion = ipVersion;
 }
 
-void PacketProcessor::setTTL(uint8_t ttl)
+void PacketProcessor::setTtl(uint8_t ttl)
 {
     this->ttl = ttl;
 }
@@ -65,7 +68,7 @@ bool PacketProcessor::filtersIpVersion()
     return this->ipVersion == -1 ? false : true;
 }
 
-bool PacketProcessor::reducesTTL()
+bool PacketProcessor::reducesTtl()
 {
     return this->ttl == -1 ? false : true;
 }
@@ -145,9 +148,9 @@ pcpp::Packet* PacketProcessor::filterIpVersion(pcpp::Packet* parsedPacket)
     return nullptr;
 }
 
-pcpp::Packet* PacketProcessor::reduceTTL(pcpp::Packet* parsedPacket)
+pcpp::Packet* PacketProcessor::reduceTtl(pcpp::Packet* parsedPacket)
 {
-    if (this->reducesTTL()) {
+    if (this->reducesTtl()) {
         if(parsedPacket->isPacketOfType(pcpp::IPv4)) {
             auto ipLayer = parsedPacket->getLayerOfType<pcpp::IPv4Layer>();
             if (this->ttl < ipLayer->getIPv4Header()->timeToLive) {
@@ -166,7 +169,7 @@ pcpp::Packet* PacketProcessor::reduceTTL(pcpp::Packet* parsedPacket)
     return nullptr;
 }
 
-pcpp::Packet* PacketProcessor::filterICMP(pcpp::Packet* parsedPacket)
+pcpp::Packet* PacketProcessor::filterIcmp(pcpp::Packet* parsedPacket)
 {
     if(!parsedPacket->isPacketOfType(pcpp::ICMP)) {
         return parsedPacket;

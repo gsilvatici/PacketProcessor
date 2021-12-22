@@ -24,7 +24,7 @@ namespace pp
         pcpp::PcapFileWriterDevice* writer;
         bool filtersVLAN();
         bool filtersIpVersion();
-        bool reducesTTL();
+        bool reducesTtl();
         bool replacesDnsAddress();
         bool replacesDnsPort();
 
@@ -34,7 +34,7 @@ namespace pp
         ~PacketProcessor();
         void setVlanId(uint16_t vlanId);
         void setIpVersion(uint8_t ipVersion);
-        void setTTL(uint8_t ttl);
+        void setTtl(uint8_t ttl);
         void setDnsAddress(pcpp::IPAddress* dnsAddress);
         void setDnsPort(uint16_t dnsPort);
         bool initializeReader(std::string inputFile);
@@ -44,8 +44,8 @@ namespace pp
         pcpp::Packet* filterVlanId(pcpp::Packet* parsedPacket);
         pcpp::Packet* filterNonEthernet(pcpp::Packet* parsedPacket);
         pcpp::Packet* filterIpVersion(pcpp::Packet* parsedPacket);
-        pcpp::Packet* reduceTTL(pcpp::Packet* parsedPacket);
-        pcpp::Packet* filterICMP(pcpp::Packet* parsedPacket);
+        pcpp::Packet* reduceTtl(pcpp::Packet* parsedPacket);
+        pcpp::Packet* filterIcmp(pcpp::Packet* parsedPacket);
         pcpp::Packet* replaceDnsAddress(pcpp::Packet* parsedPacket);
         pcpp::Packet* replaceDnsPort(pcpp::Packet* parsedPacket);
         // public ProcessPacket(pcpp::RawPacket rawPacket);
