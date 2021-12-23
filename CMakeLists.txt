@@ -2,15 +2,16 @@ cmake_minimum_required(VERSION 3.10)
 
 project(pcap-convert)
 
+set(CMAKE_CXX_COMPILER g++)
+
 file(GLOB_RECURSE sources      app/src/main.cpp app/src/pp/*.cpp  app/include/pp/*.h)
 file(GLOB_RECURSE sources_test test/src/*.cpp)
 
 add_executable(pcap-convert ${sources})
-# libCommon++.a libPacket++.a libPcap++.a
-# -lPcap++ -lPacket++ -lCommon++ -lpcap
+
 target_link_libraries(${PROJECT_NAME} libPcap++.a libPacket++.a libCommon++.a libpcap.a)
 
-target_compile_options(pcap-convert PUBLIC -static-libstdc++ -std=c++17 -I h -pthread -Wall)
+target_compile_options(pcap-convert PUBLIC -std=c++17 -Wall)
 
 target_include_directories(pcap-convert PUBLIC app/include /usr/local/include/pcapplusplus)
 
@@ -24,21 +25,26 @@ if(GTEST_FOUND)
   # testing target
   target_compile_definitions(unit_tests PUBLIC UNIT_TESTS)
 
+  target_compile_options(unit_tests PUBLIC -static-libstdc++ -std=c++17 -I h -pthread -Wall)
+
   target_include_directories(unit_tests PUBLIC app/include /usr/local/include/pcapplusplus)
 
-  target_link_libraries(${PROJECT_NAME} libgtest.a libPcap++.a libPacket++.a libCommon++.a libpcap.a)
+  set_target_properties(unit_tests PROPERTIES LINK_SEARCH_START_STATIC 1)
+  set_target_properties(unit_tests PROPERTIES LINK_SEARCH_END_STATIC 1)
+  set(CMAKE_FIND_LIBRARY_SUFFIXES ".a")
 
-  # /usr/local/lib/libgtest.a
+  target_link_libraries(${PROJECT_NAME} libPcap++.a libPacket++.a libCommon++.a libpcap.a pthread.a)
+
   # this allows us to use our executable as a link library
   # therefore we can inherit all compiler options and library dependencies
-  set_target_properties(pcap-convert PROPERTIES ENABLE_EXPORTS on)
+  # set_target_properties(pcap-convert PROPERTIES ENABLE_EXPORTS on)
 
   target_link_libraries(unit_tests PUBLIC
-    ${GTEST_BOTH_LIBRARIES}
-    example
+    ${GTEST_BOTH_LIBRARIES} libPcap++.a libPacket++.a libCommon++.a libpcap.a libpthread.a
+    # pcap-convert
   )
 
-  target_include_directories(unit_tests PUBLIC
-    ${GTEST_INCLUDE_DIRS} # doesn't do anything on Linux
-  )
+  # target_include_directories(unit_tests PUBLIC
+  #   ${GTEST_INCLUDE_DIRS} # doesn't do anything on Linux
+  # )
 endif()
