@@ -10,7 +10,7 @@ add_executable(pcap-convert ${sources})
 # -lPcap++ -lPacket++ -lCommon++ -lpcap
 target_link_libraries(${PROJECT_NAME} libPcap++.a libPacket++.a libCommon++.a libpcap.a)
 
-target_compile_options(pcap-convert PUBLIC -std=c++17 -Wall)
+target_compile_options(pcap-convert PUBLIC -static-libstdc++ -std=c++17 -I h -pthread -Wall)
 
 target_include_directories(pcap-convert PUBLIC app/include /usr/local/include/pcapplusplus)
 
@@ -24,6 +24,11 @@ if(GTEST_FOUND)
   # testing target
   target_compile_definitions(unit_tests PUBLIC UNIT_TESTS)
 
+  target_include_directories(unit_tests PUBLIC app/include /usr/local/include/pcapplusplus)
+
+  target_link_libraries(${PROJECT_NAME} libgtest.a libPcap++.a libPacket++.a libCommon++.a libpcap.a)
+
+  # /usr/local/lib/libgtest.a
   # this allows us to use our executable as a link library
   # therefore we can inherit all compiler options and library dependencies
   set_target_properties(pcap-convert PROPERTIES ENABLE_EXPORTS on)

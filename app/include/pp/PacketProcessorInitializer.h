@@ -2,6 +2,7 @@
 #define PACKETPROCESSORINITIALIZER_H_
 
 #include <iostream>
+#include <getopt.h>
 
 namespace pp
 {
