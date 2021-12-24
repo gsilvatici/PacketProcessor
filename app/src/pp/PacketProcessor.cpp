@@ -110,14 +110,15 @@ Packet* PacketProcessor::filterVlanId(Packet* parsedPacket)
 {
     if (this->filtersVLAN()) {
         auto vlanLayer = parsedPacket->getLayerOfType<VlanLayer>();
-        if (vlanLayer == nullptr) {
+        if (!vlanLayer) {
             std::cerr << "Something went wrong, couldn't find VLAN id" << std::endl;
         }
         if (this->vlanId == vlanLayer->getVlanID()) {
               return parsedPacket;
         }
+        return nullptr;
     }
-    return nullptr;
+    return parsedPacket;
 }
 
 Packet* PacketProcessor::filterNonEthernet(Packet* parsedPacket)
@@ -143,8 +144,9 @@ Packet* PacketProcessor::filterIpVersion(Packet* parsedPacket)
                     return parsedPacket;
             break;
         }
+        return nullptr;
     }
-    return nullptr;
+    return parsedPacket;
 }
 
 Packet* PacketProcessor::reduceTtl(Packet* parsedPacket)
@@ -154,6 +156,9 @@ Packet* PacketProcessor::reduceTtl(Packet* parsedPacket)
             auto ipLayer = parsedPacket->getLayerOfType<IPv4Layer>();
             if (this->ttl < ipLayer->getIPv4Header()->timeToLive) {
                 ipLayer->getIPv4Header()->timeToLive -= this->ttl;
+                int aux = ipLayer->getIPv4Header()->timeToLive;
+                printf(" %d ", aux);
+                // std::cout << ipLayer->getIPv4Header()->timeToLive;
                 return parsedPacket;
             }
         }
@@ -224,10 +229,11 @@ int PacketProcessor::processFile(const std::string inputFile, const std::string 
           Packet parsedPacket(&rawPacket);
 
           Packet* processedPacket = &parsedPacket;
+          
           processedPacket = processPacket(processedPacket);
 
-          // if (processedPacket)   
-          //     writer->writePacket(*(processedPacket->getRawPacket()));       
+          if (processedPacket)   
+              writer->writePacket(*(processedPacket->getRawPacket()));       
     }
     return 0;
 }
