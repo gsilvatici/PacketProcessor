@@ -83,4 +83,3 @@ void PacketProcessorInitializer::printUsage()
     << "    -h                : Displays this help message and exits" << endl
     << endl;
 }
-

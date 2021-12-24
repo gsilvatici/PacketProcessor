@@ -281,7 +281,6 @@ TEST(ReplaceDnsAddressAndPort, DISABLED_FromFileWithOnlyOneTCPPacketWithDNSLayer
 
 }
 
-#ifdef TESTING
 int main(int argc, char **argv)
 {
         ::testing::InitGoogleTest(&argc, argv);
@@ -293,4 +292,3 @@ int main(int argc, char **argv)
             std::cout << "FAILED" << std::endl;
         return 0;
 }
-#endif

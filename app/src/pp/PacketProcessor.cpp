@@ -5,13 +5,7 @@ using namespace pcpp;
 
 PacketProcessor::PacketProcessor()
 {
-    vlanId = -1;
-    ipVersion = -1;
-    ttl = -1;
-    dnsAddress = nullptr;
-    dnsPort = -1;
-    reader = nullptr;
-    writer = nullptr;
+    filters.reset(new bool[5] {false, false, false, false, false});
 }
 
 PacketProcessor::PacketProcessor(uint16_t vlanId, uint8_t ipVersion, uint8_t ttl, IPAddress* dnsAddress, uint16_t dnsPort)
@@ -32,51 +26,61 @@ PacketProcessor::~PacketProcessor()
 void PacketProcessor::setVlanId(uint16_t vlanId)
 {
     this->vlanId = vlanId;
+    filters[0] = true;
 }
 
 void PacketProcessor::setIpVersion(uint8_t ipVersion)
 {
     this->ipVersion = ipVersion;
+    filters[1] = true;
 }
 
 void PacketProcessor::setTtl(uint8_t ttl)
 {
     this->ttl = ttl;
+    filters[2] = true;
 }
 
 void PacketProcessor::setDnsAddress(IPAddress* dnsAddress)
 {
     this->dnsAddress = dnsAddress;
+    filters[3] = true;
 }
 
 void PacketProcessor::setDnsPort(uint16_t dnsPort)
 {
     this->dnsPort = dnsPort;
+    filters[4] = true;
 }
 
 bool PacketProcessor::filtersVLAN()
 {
-    return this->vlanId == -1 ? false : true;
+    return filters[0];
+    // return this->vlanId == -1 ? false : true;
 }
 
 bool PacketProcessor::filtersIpVersion()
 {
-    return this->ipVersion == -1 ? false : true;
+    return filters[1];
+    // return this->ipVersion == -1 ? false : true;
 }
 
 bool PacketProcessor::reducesTtl()
 {
-    return this->ttl == -1 ? false : true;
+    return filters[2];
+    // return this->ttl == -1 ? false : true;
 }
 
 bool PacketProcessor::replacesDnsAddress()
 {
-    return this->dnsAddress == nullptr ? false : true;
+    return filters[3];
+    // return this->dnsAddress == nullptr ? false : true;
 }
 
 bool PacketProcessor::replacesDnsPort()
 {
-    return this->dnsPort == -1 ? false : true;
+    return filters[4];
+    // return this->dnsPort == -1 ? false : true;
 }
 
 bool PacketProcessor::initializeReader(std::string inputFile)
@@ -207,22 +211,14 @@ Packet* PacketProcessor::processPacket(Packet* parsedPacket)
 }
 
 int PacketProcessor::processFile(std::string inputFile, std::string outputFile)
-{    
-    initializeReader(inputFile);
-    initializeWriter(outputFile);
-
-    if (!reader) {
-      std::cerr << "Cannot determine reader for file type" << std::endl;
+{
+    if (!initializeReader(inputFile)) {
+      std::cerr << "Cannot open " + inputFile + "file for reading" << std::endl;
       return 1;
     }
 
-    if (!reader->open()) {
-      std::cerr << "Cannot open " + inputFile + " for reading" << std::endl;
-      return 1;
-    }
-
-    if (!writer->open()) {
-      std::cerr << "Cannot open " + outputFile + " for writing" << std::endl;
+    if (!initializeWriter(outputFile)) {
+      std::cerr << "Cannot open " + outputFile + "file for writing" << std::endl;
       return 1;
     }
 

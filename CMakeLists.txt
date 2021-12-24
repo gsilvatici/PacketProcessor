@@ -4,7 +4,8 @@ project(pcap-convert)
 
 set(CMAKE_CXX_COMPILER g++)
 
-file(GLOB_RECURSE sources      app/src/main.cpp app/src/pp/*.cpp  app/include/pp/*.h)
+file(GLOB_RECURSE sources_pp app/src/pp/*.cpp  app/include/pp/*.h)
+file(GLOB_RECURSE sources app/src/main.cpp app/src/pp/*.cpp  app/include/pp/*.h)
 file(GLOB_RECURSE sources_test test/src/*.cpp)
 
 add_executable(pcap-convert ${sources})
@@ -18,12 +19,12 @@ target_include_directories(pcap-convert PUBLIC app/include /usr/local/include/pc
 find_package(GTest)
 
 if(GTEST_FOUND)
-  add_executable(unit_tests ${sources_test} ${sources})
+  add_executable(unit_tests ${sources_test} ${sources_pp})
 
   # we add this define to prevent collision with the main
   # this might be better solved by not adding the source with the main to the
   # testing target
-  target_compile_definitions(unit_tests PUBLIC TESTING)
+  # target_compile_definitions(unit_tests PUBLIC TESTING)
 
   target_compile_options(unit_tests PUBLIC -static-libstdc++ -std=c++17 -I h -pthread -Wall)
 

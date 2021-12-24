@@ -20,8 +20,9 @@ namespace pp
         uint8_t ttl;
         pcpp::IPAddress* dnsAddress;
         uint16_t dnsPort;
-        std::shared_ptr<pcpp::IFileReaderDevice> reader;
-        std::shared_ptr<pcpp::PcapFileWriterDevice> writer;
+        std::unique_ptr<pcpp::IFileReaderDevice> reader;
+        std::unique_ptr<pcpp::PcapFileWriterDevice> writer;
+        std::unique_ptr<bool []> filters;
         bool filtersVLAN();
         bool filtersIpVersion();
         bool reducesTtl();
