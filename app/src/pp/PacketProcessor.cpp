@@ -5,13 +5,13 @@ using namespace pcpp;
 
 PacketProcessor::PacketProcessor()
 {
-    this->vlanId = -1;
-    this->ipVersion = -1;
-    this->ttl = -1;
-    this->dnsAddress = nullptr;
-    this->dnsPort = -1;
-    this->reader = nullptr;
-    this->writer = nullptr;
+    vlanId = -1;
+    ipVersion = -1;
+    ttl = -1;
+    dnsAddress = nullptr;
+    dnsPort = -1;
+    reader = nullptr;
+    writer = nullptr;
 }
 
 PacketProcessor::PacketProcessor(uint16_t vlanId, uint8_t ipVersion, uint8_t ttl, IPAddress* dnsAddress, uint16_t dnsPort)
@@ -111,10 +111,9 @@ Packet* PacketProcessor::filterVlanId(Packet* parsedPacket)
 {
     if (this->filtersVLAN()) {
         auto vlanLayer = parsedPacket->getLayerOfType<VlanLayer>();
-        // if (vlanLayer == NULL)
-        // {
-        //     std::cerr << "Something went wrong, couldn't find IPv4 layer" << std::endl;
-        // }
+        if (vlanLayer == nullptr) {
+            std::cerr << "Something went wrong, couldn't find VLAN id" << std::endl;
+        }
         if (this->vlanId == vlanLayer->getVlanID()) {
               return parsedPacket;
         }
@@ -134,7 +133,7 @@ Packet* PacketProcessor::filterIpVersion(Packet* parsedPacket)
 {
     if (this->filtersIpVersion()) {
         switch(this->ipVersion)
-            {
+        {
             case 4:
                 if(parsedPacket->isPacketOfType(IPv4))
                     return parsedPacket;
@@ -144,9 +143,6 @@ Packet* PacketProcessor::filterIpVersion(Packet* parsedPacket)
                 if(parsedPacket->isPacketOfType(IPv6))
                     return parsedPacket;
             break;
-        // if ((this->ipVersion == 4 && parsedPacket->isPacketOfType(IPv4)) ||
-        //     (this->ipVersion == 6 && parsedPacket->isPacketOfType(IPv6))) {
-        //       return parsedPacket;
         }
     }
     return nullptr;
@@ -183,7 +179,7 @@ Packet* PacketProcessor::filterIcmp(Packet* parsedPacket)
 
 Packet* PacketProcessor::replaceDnsAddress(Packet* parsedPacket)
 {
-    if (this->replacesDnsAddress()) {
+    if (replacesDnsAddress()) {
         return parsedPacket;
     }
     return nullptr;
@@ -191,11 +187,56 @@ Packet* PacketProcessor::replaceDnsAddress(Packet* parsedPacket)
 
 Packet* PacketProcessor::replaceDnsPort(Packet* parsedPacket)
 {    
-    if (this->replacesDnsPort()) {
+    if (replacesDnsPort()) {
         if(parsedPacket->isPacketOfType(UDP) && parsedPacket->isPacketOfType(DNS)) {
             // DnsLayer* dnsLayer = parsedPacket->getLayerOfType<DnsLayer>();
             return parsedPacket;
         }
     }
     return nullptr;
+}
+
+Packet* PacketProcessor::processPacket(Packet* parsedPacket)
+{   
+    // If any filter drop the packet return a droped packet
+    if (!filterVlanId(parsedPacket) || !filterNonEthernet(parsedPacket)
+        || !filterIpVersion(parsedPacket) || !filterIcmp(parsedPacket))
+          return nullptr;
+
+    return reduceTtl(parsedPacket);
+}
+
+int PacketProcessor::processFile(std::string inputFile, std::string outputFile)
+{    
+    initializeReader(inputFile);
+    initializeWriter(outputFile);
+
+    if (!reader) {
+      std::cerr << "Cannot determine reader for file type" << std::endl;
+      return 1;
+    }
+
+    if (!reader->open()) {
+      std::cerr << "Cannot open " + inputFile + " for reading" << std::endl;
+      return 1;
+    }
+
+    if (!writer->open()) {
+      std::cerr << "Cannot open " + outputFile + " for writing" << std::endl;
+      return 1;
+    }
+
+    RawPacket rawPacket;
+
+    while (reader->getNextPacket(rawPacket))
+    {
+          Packet parsedPacket(&rawPacket);
+
+          Packet* processedPacket = &parsedPacket;
+          processedPacket = processPacket(processedPacket);
+
+          // if (processedPacket)   
+          //     writer->writePacket(*(processedPacket->getRawPacket()));       
+    }
+    return 0;
 }

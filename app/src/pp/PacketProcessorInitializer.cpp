@@ -19,7 +19,6 @@ void PacketProcessorInitializer::run(int argc, char **argv)
             case 0:
                 break;
             case 'i':
-                // printf(optarg);
                 inputFile = optarg;
                 break;
             case 'o':
@@ -27,9 +26,7 @@ void PacketProcessorInitializer::run(int argc, char **argv)
                 break;
             case vlan:
                 if (OPTIONAL_ARGUMENT_IS_PRESENT) {
-                    uint16_t vlanId = atoi(optarg);
-                    packetProcessor->setVlanId(vlanId);
-                    // printf(" %d", vlanId);
+                    packetProcessor->setVlanId(atoi(optarg));
                 }
                 break;
             case ipVersion:
@@ -61,6 +58,7 @@ void PacketProcessorInitializer::run(int argc, char **argv)
                 exit(-1);
         }
     }
+    packetProcessor->processFile(inputFile, outputFile);
 }
 
 void PacketProcessorInitializer::printUsage()

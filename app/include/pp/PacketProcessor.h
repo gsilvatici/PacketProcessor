@@ -27,6 +27,7 @@ namespace pp
         bool reducesTtl();
         bool replacesDnsAddress();
         bool replacesDnsPort();
+        pcpp::Packet* processPacket(pcpp::Packet* parsedPacket);
 
       public:
         PacketProcessor();
@@ -48,7 +49,7 @@ namespace pp
         pcpp::Packet* filterIcmp(pcpp::Packet* parsedPacket);
         pcpp::Packet* replaceDnsAddress(pcpp::Packet* parsedPacket);
         pcpp::Packet* replaceDnsPort(pcpp::Packet* parsedPacket);
-        // public ProcessPacket(pcpp::RawPacket rawPacket);
+        int processFile(std::string inputFile, std::string outputFile);
     };
 }
 
