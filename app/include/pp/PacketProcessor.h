@@ -32,15 +32,15 @@ namespace pp
 
       public:
         PacketProcessor();
-        PacketProcessor(uint16_t vlanId, uint8_t ipVersion, uint8_t ttl, pcpp::IPAddress* dnsAddress, uint16_t dnsPort);
+        PacketProcessor(const uint16_t vlanId, const uint8_t ipVersion, const uint8_t ttl, pcpp::IPAddress* dnsAddress, const uint16_t dnsPort);
         ~PacketProcessor();
-        void setVlanId(uint16_t vlanId);
-        void setIpVersion(uint8_t ipVersion);
-        void setTtl(uint8_t ttl);
+        void setVlanId(const uint16_t vlanId);
+        void setIpVersion(const uint8_t ipVersion);
+        void setTtl(const uint8_t ttl);
         void setDnsAddress(pcpp::IPAddress* dnsAddress);
-        void setDnsPort(uint16_t dnsPort);
-        bool initializeReader(std::string inputFile);
-        bool initializeWriter(std::string outputFile);
+        void setDnsPort(const uint16_t dnsPort);
+        bool initializeReader(const std::string inputFile);
+        bool initializeWriter(const std::string outputFile);
         pcpp::IFileReaderDevice* getPacketReader();
         pcpp::PcapFileWriterDevice* getPacketWriter();
         pcpp::Packet* filterVlanId(pcpp::Packet* parsedPacket);
@@ -50,7 +50,7 @@ namespace pp
         pcpp::Packet* filterIcmp(pcpp::Packet* parsedPacket);
         pcpp::Packet* replaceDnsAddress(pcpp::Packet* parsedPacket);
         pcpp::Packet* replaceDnsPort(pcpp::Packet* parsedPacket);
-        int processFile(std::string inputFile, std::string outputFile);
+        int processFile(const std::string inputFile, const std::string outputFile);
     };
 }
 

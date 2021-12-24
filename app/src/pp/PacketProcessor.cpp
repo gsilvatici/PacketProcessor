@@ -8,34 +8,34 @@ PacketProcessor::PacketProcessor()
     filters.reset(new bool[5] {false, false, false, false, false});
 }
 
-PacketProcessor::PacketProcessor(uint16_t vlanId, uint8_t ipVersion, uint8_t ttl, IPAddress* dnsAddress, uint16_t dnsPort)
+PacketProcessor::PacketProcessor(const uint16_t vlanId, const uint8_t ipVersion, const uint8_t ttl, IPAddress* dnsAddress, const uint16_t dnsPort)
     : vlanId(vlanId), ipVersion(ipVersion), ttl(ttl), dnsAddress(dnsAddress), dnsPort(dnsPort), reader(nullptr), writer(nullptr)
 {
+    filters.reset(new bool[5] {true, true, true, true, true});
 }
 
 PacketProcessor::~PacketProcessor()
 {
-    if(reader) {
+    if(reader)
         reader->close();
-    }   
-    if(writer) {
+
+    if(writer) 
         writer->close();
-    }
 }
 
-void PacketProcessor::setVlanId(uint16_t vlanId)
+void PacketProcessor::setVlanId(const uint16_t vlanId)
 {
     this->vlanId = vlanId;
     filters[0] = true;
 }
 
-void PacketProcessor::setIpVersion(uint8_t ipVersion)
+void PacketProcessor::setIpVersion(const uint8_t ipVersion)
 {
     this->ipVersion = ipVersion;
     filters[1] = true;
 }
 
-void PacketProcessor::setTtl(uint8_t ttl)
+void PacketProcessor::setTtl(const uint8_t ttl)
 {
     this->ttl = ttl;
     filters[2] = true;
@@ -47,7 +47,7 @@ void PacketProcessor::setDnsAddress(IPAddress* dnsAddress)
     filters[3] = true;
 }
 
-void PacketProcessor::setDnsPort(uint16_t dnsPort)
+void PacketProcessor::setDnsPort(const uint16_t dnsPort)
 {
     this->dnsPort = dnsPort;
     filters[4] = true;
@@ -56,34 +56,29 @@ void PacketProcessor::setDnsPort(uint16_t dnsPort)
 bool PacketProcessor::filtersVLAN()
 {
     return filters[0];
-    // return this->vlanId == -1 ? false : true;
 }
 
 bool PacketProcessor::filtersIpVersion()
 {
     return filters[1];
-    // return this->ipVersion == -1 ? false : true;
 }
 
 bool PacketProcessor::reducesTtl()
 {
     return filters[2];
-    // return this->ttl == -1 ? false : true;
 }
 
 bool PacketProcessor::replacesDnsAddress()
 {
     return filters[3];
-    // return this->dnsAddress == nullptr ? false : true;
 }
 
 bool PacketProcessor::replacesDnsPort()
 {
     return filters[4];
-    // return this->dnsPort == -1 ? false : true;
 }
 
-bool PacketProcessor::initializeReader(std::string inputFile)
+bool PacketProcessor::initializeReader(const std::string inputFile)
 {
     reader.reset(IFileReaderDevice::getReader(inputFile));
     if (reader) {
@@ -92,7 +87,7 @@ bool PacketProcessor::initializeReader(std::string inputFile)
     return false; 
 }
 
-bool PacketProcessor::initializeWriter(std::string outputFile)
+bool PacketProcessor::initializeWriter(const std::string outputFile)
 {
     writer.reset(new PcapFileWriterDevice(outputFile, LINKTYPE_ETHERNET));
     if (writer) {
@@ -210,7 +205,7 @@ Packet* PacketProcessor::processPacket(Packet* parsedPacket)
     return reduceTtl(parsedPacket);
 }
 
-int PacketProcessor::processFile(std::string inputFile, std::string outputFile)
+int PacketProcessor::processFile(const std::string inputFile, const std::string outputFile)
 {
     if (!initializeReader(inputFile)) {
       std::cerr << "Cannot open " + inputFile + "file for reading" << std::endl;
