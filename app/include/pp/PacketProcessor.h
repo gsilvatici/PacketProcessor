@@ -8,6 +8,7 @@
 #include "IPv6Layer.h"
 #include "Packet.h"
 #include "PcapFileDevice.h"
+#include "UdpLayer.h"
 #include "VlanLayer.h"
 
 namespace pp

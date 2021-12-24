@@ -184,6 +184,29 @@ Packet* PacketProcessor::filterIcmp(Packet* parsedPacket)
 Packet* PacketProcessor::replaceDnsAddress(Packet* parsedPacket)
 {
     if (replacesDnsAddress()) {
+
+      	// extract all packet layers
+        auto ipLayer = parsedPacket->getLayerOfType<pcpp::IPLayer>();
+        auto udpLayer = parsedPacket->getLayerOfType<pcpp::UdpLayer>();
+        auto dnsLayer = parsedPacket->getLayerOfType<pcpp::DnsLayer>();
+
+        // skip DNS requests with more than 1 request or with 0 requests
+        // if (dnsLayer->getDnsHeader()->numberOfQuestions != pcpp::hostToNet16(1) || dnsLayer->getFirstQuery() == NULL)
+        //    return;
+
+
+        pcpp::IPAddress srcIP = ipLayer->getSrcIPAddress();
+        pcpp::IPv4Layer* ip4Layer = dynamic_cast<pcpp::IPv4Layer*>(ipLayer);
+        pcpp::IPv6Layer* ip6Layer = dynamic_cast<pcpp::IPv6Layer*>(ipLayer);
+        
+        if (ip4Layer) {
+          ip4Layer->setSrcIPv4Address();
+          ip4Layer->setDstIPv4Address();
+        } else {
+          ip6Layer->setSrcIPv6Address();
+          ip6Layer->setDstIPv6Address();
+        }
+
         return parsedPacket;
     }
     return nullptr;
