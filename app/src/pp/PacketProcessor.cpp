@@ -1,7 +1,7 @@
-// #include "../../include/pp/PacketProcessor.h"
 #include "pp/PacketProcessor.h"
 
 using namespace pp;
+using namespace pcpp;
 
 PacketProcessor::PacketProcessor()
 {
@@ -14,7 +14,7 @@ PacketProcessor::PacketProcessor()
     this->writer = nullptr;
 }
 
-PacketProcessor::PacketProcessor(uint16_t vlanId, uint8_t ipVersion, uint8_t ttl, pcpp::IPAddress* dnsAddress, uint16_t dnsPort)
+PacketProcessor::PacketProcessor(uint16_t vlanId, uint8_t ipVersion, uint8_t ttl, IPAddress* dnsAddress, uint16_t dnsPort)
     : vlanId(vlanId), ipVersion(ipVersion), ttl(ttl), dnsAddress(dnsAddress), dnsPort(dnsPort), reader(nullptr), writer(nullptr)
 {
 }
@@ -23,11 +23,9 @@ PacketProcessor::~PacketProcessor()
 {
     if(reader) {
         reader->close();
-        delete reader;
     }   
     if(writer) {
         writer->close();
-        delete writer;
     }
 }
 
@@ -46,7 +44,7 @@ void PacketProcessor::setTtl(uint8_t ttl)
     this->ttl = ttl;
 }
 
-void PacketProcessor::setDnsAddress(pcpp::IPAddress* dnsAddress)
+void PacketProcessor::setDnsAddress(IPAddress* dnsAddress)
 {
     this->dnsAddress = dnsAddress;
 }
@@ -83,39 +81,36 @@ bool PacketProcessor::replacesDnsPort()
 
 bool PacketProcessor::initializeReader(std::string inputFile)
 {
-    reader = pcpp::IFileReaderDevice::getReader(inputFile);
-    if (reader != nullptr) {
-        // bool ret = reader->open();
-        // if (this->FiltersVLAN()) {
-        //     pcpp::VlanFilter vlanFilter(this->vlanId);
-        //     reader->setFilter(vlanFilter);
-        // }
+    reader.reset(IFileReaderDevice::getReader(inputFile));
+    if (reader) {
         return reader->open();
-    } else {
-        return false;        
-    }   
+    }
+    return false; 
 }
 
 bool PacketProcessor::initializeWriter(std::string outputFile)
 {
-    writer = new pcpp::PcapFileWriterDevice(outputFile, pcpp::LINKTYPE_ETHERNET);
-    return writer->open();
+    writer.reset(new PcapFileWriterDevice(outputFile, LINKTYPE_ETHERNET));
+    if (writer) {
+        return writer->open();
+    } 
+    return false;  
 }
 
-pcpp::IFileReaderDevice* PacketProcessor::getPacketReader()
+IFileReaderDevice* PacketProcessor::getPacketReader()
 {
-    return this->reader;
+    return reader.get();
 }
 
-pcpp::PcapFileWriterDevice* PacketProcessor::getPacketWriter()
+PcapFileWriterDevice* PacketProcessor::getPacketWriter()
 {
-    return this->writer;
+    return writer.get();
 }
 
-pcpp::Packet* PacketProcessor::filterVlanId(pcpp::Packet* parsedPacket)
+Packet* PacketProcessor::filterVlanId(Packet* parsedPacket)
 {
     if (this->filtersVLAN()) {
-        auto vlanLayer = parsedPacket->getLayerOfType<pcpp::VlanLayer>();
+        auto vlanLayer = parsedPacket->getLayerOfType<VlanLayer>();
         // if (vlanLayer == NULL)
         // {
         //     std::cerr << "Something went wrong, couldn't find IPv4 layer" << std::endl;
@@ -127,48 +122,48 @@ pcpp::Packet* PacketProcessor::filterVlanId(pcpp::Packet* parsedPacket)
     return nullptr;
 }
 
-pcpp::Packet* PacketProcessor::filterNonEthernet(pcpp::Packet* parsedPacket)
+Packet* PacketProcessor::filterNonEthernet(Packet* parsedPacket)
 {
-    if(parsedPacket->isPacketOfType(pcpp::Ethernet)) {
+    if(parsedPacket->isPacketOfType(Ethernet)) {
         return parsedPacket;
     }
     return nullptr;
 }
 
-pcpp::Packet* PacketProcessor::filterIpVersion(pcpp::Packet* parsedPacket)
+Packet* PacketProcessor::filterIpVersion(Packet* parsedPacket)
 {
     if (this->filtersIpVersion()) {
         switch(this->ipVersion)
             {
             case 4:
-                if(parsedPacket->isPacketOfType(pcpp::IPv4))
+                if(parsedPacket->isPacketOfType(IPv4))
                     return parsedPacket;
             break;
 
             case 6:
-                if(parsedPacket->isPacketOfType(pcpp::IPv6))
+                if(parsedPacket->isPacketOfType(IPv6))
                     return parsedPacket;
             break;
-        // if ((this->ipVersion == 4 && parsedPacket->isPacketOfType(pcpp::IPv4)) ||
-        //     (this->ipVersion == 6 && parsedPacket->isPacketOfType(pcpp::IPv6))) {
+        // if ((this->ipVersion == 4 && parsedPacket->isPacketOfType(IPv4)) ||
+        //     (this->ipVersion == 6 && parsedPacket->isPacketOfType(IPv6))) {
         //       return parsedPacket;
         }
     }
     return nullptr;
 }
 
-pcpp::Packet* PacketProcessor::reduceTtl(pcpp::Packet* parsedPacket)
+Packet* PacketProcessor::reduceTtl(Packet* parsedPacket)
 {
     if (this->reducesTtl()) {
-        if(parsedPacket->isPacketOfType(pcpp::IPv4)) {
-            auto ipLayer = parsedPacket->getLayerOfType<pcpp::IPv4Layer>();
+        if(parsedPacket->isPacketOfType(IPv4)) {
+            auto ipLayer = parsedPacket->getLayerOfType<IPv4Layer>();
             if (this->ttl < ipLayer->getIPv4Header()->timeToLive) {
                 ipLayer->getIPv4Header()->timeToLive -= this->ttl;
                 return parsedPacket;
             }
         }
-        if(parsedPacket->isPacketOfType(pcpp::IPv6)) {
-            auto ipLayer = parsedPacket->getLayerOfType<pcpp::IPv6Layer>();
+        if(parsedPacket->isPacketOfType(IPv6)) {
+            auto ipLayer = parsedPacket->getLayerOfType<IPv6Layer>();
             if (this->ttl < ipLayer->getIPv6Header()->hopLimit) {
                 ipLayer->getIPv6Header()->hopLimit -= this->ttl;
                 return parsedPacket;
@@ -178,15 +173,15 @@ pcpp::Packet* PacketProcessor::reduceTtl(pcpp::Packet* parsedPacket)
     return nullptr;
 }
 
-pcpp::Packet* PacketProcessor::filterIcmp(pcpp::Packet* parsedPacket)
+Packet* PacketProcessor::filterIcmp(Packet* parsedPacket)
 {
-    if(!parsedPacket->isPacketOfType(pcpp::ICMP)) {
+    if(!parsedPacket->isPacketOfType(ICMP)) {
         return parsedPacket;
     }
     return nullptr;
 }
 
-pcpp::Packet* PacketProcessor::replaceDnsAddress(pcpp::Packet* parsedPacket)
+Packet* PacketProcessor::replaceDnsAddress(Packet* parsedPacket)
 {
     if (this->replacesDnsAddress()) {
         return parsedPacket;
@@ -194,11 +189,11 @@ pcpp::Packet* PacketProcessor::replaceDnsAddress(pcpp::Packet* parsedPacket)
     return nullptr;
 }
 
-pcpp::Packet* PacketProcessor::replaceDnsPort(pcpp::Packet* parsedPacket)
+Packet* PacketProcessor::replaceDnsPort(Packet* parsedPacket)
 {    
     if (this->replacesDnsPort()) {
-        if(parsedPacket->isPacketOfType(pcpp::UDP) && parsedPacket->isPacketOfType(pcpp::DNS)) {
-            // pcpp::DnsLayer* dnsLayer = parsedPacket->getLayerOfType<pcpp::DnsLayer>();
+        if(parsedPacket->isPacketOfType(UDP) && parsedPacket->isPacketOfType(DNS)) {
+            // DnsLayer* dnsLayer = parsedPacket->getLayerOfType<DnsLayer>();
             return parsedPacket;
         }
     }

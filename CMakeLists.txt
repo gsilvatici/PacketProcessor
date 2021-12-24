@@ -23,7 +23,7 @@ if(GTEST_FOUND)
   # we add this define to prevent collision with the main
   # this might be better solved by not adding the source with the main to the
   # testing target
-  target_compile_definitions(unit_tests PUBLIC UNIT_TESTS)
+  target_compile_definitions(unit_tests PUBLIC TESTING)
 
   target_compile_options(unit_tests PUBLIC -static-libstdc++ -std=c++17 -I h -pthread -Wall)
 
@@ -43,8 +43,4 @@ if(GTEST_FOUND)
     ${GTEST_BOTH_LIBRARIES} libPcap++.a libPacket++.a libCommon++.a libpcap.a libpthread.a
     # pcap-convert
   )
-
-  # target_include_directories(unit_tests PUBLIC
-  #   ${GTEST_INCLUDE_DIRS} # doesn't do anything on Linux
-  # )
 endif()
