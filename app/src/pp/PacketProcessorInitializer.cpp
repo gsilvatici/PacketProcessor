@@ -5,6 +5,7 @@
 
 using namespace pp;
 using namespace std;
+using namespace pcpp;
 
 void PacketProcessorInitializer::run(int argc, char **argv)
 {
@@ -41,7 +42,7 @@ void PacketProcessorInitializer::run(int argc, char **argv)
                 break;
             case dnsAddr:
                 if (OPTIONAL_ARGUMENT_IS_PRESENT) {
-                    // packetProcessor->setDnsAddress(atoi(optarg));
+                    packetProcessor->setDnsAddress(IPAddress(optarg));
                 }
                 break;
             case dnsPort:

@@ -18,7 +18,7 @@ namespace pp
         uint16_t vlanId;
         uint8_t ipVersion;
         uint8_t ttl;
-        pcpp::IPAddress* dnsAddress;
+        pcpp::IPAddress dnsAddress;
         uint16_t dnsPort;
         std::unique_ptr<pcpp::IFileReaderDevice> reader;
         std::unique_ptr<pcpp::PcapFileWriterDevice> writer;
@@ -32,12 +32,12 @@ namespace pp
 
       public:
         PacketProcessor();
-        PacketProcessor(const uint16_t vlanId, const uint8_t ipVersion, const uint8_t ttl, pcpp::IPAddress* dnsAddress, const uint16_t dnsPort);
+        PacketProcessor(const uint16_t vlanId, const uint8_t ipVersion, const uint8_t ttl, const pcpp::IPAddress &dnsAddress, const uint16_t dnsPort);
         ~PacketProcessor();
         void setVlanId(const uint16_t vlanId);
         void setIpVersion(const uint8_t ipVersion);
         void setTtl(const uint8_t ttl);
-        void setDnsAddress(pcpp::IPAddress* dnsAddress);
+        void setDnsAddress(const pcpp::IPAddress &dnsAddress);
         void setDnsPort(const uint16_t dnsPort);
         bool initializeReader(const std::string inputFile);
         bool initializeWriter(const std::string outputFile);

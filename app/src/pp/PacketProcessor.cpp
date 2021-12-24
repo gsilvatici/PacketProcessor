@@ -8,7 +8,7 @@ PacketProcessor::PacketProcessor()
     filters.reset(new bool[5] {false, false, false, false, false});
 }
 
-PacketProcessor::PacketProcessor(const uint16_t vlanId, const uint8_t ipVersion, const uint8_t ttl, IPAddress* dnsAddress, const uint16_t dnsPort)
+PacketProcessor::PacketProcessor(const uint16_t vlanId, const uint8_t ipVersion, const uint8_t ttl, const IPAddress &dnsAddress, const uint16_t dnsPort)
     : vlanId(vlanId), ipVersion(ipVersion), ttl(ttl), dnsAddress(dnsAddress), dnsPort(dnsPort), reader(nullptr), writer(nullptr)
 {
     filters.reset(new bool[5] {true, true, true, true, true});
@@ -41,7 +41,7 @@ void PacketProcessor::setTtl(const uint8_t ttl)
     filters[2] = true;
 }
 
-void PacketProcessor::setDnsAddress(IPAddress* dnsAddress)
+void PacketProcessor::setDnsAddress(const pcpp::IPAddress &dnsAddress)
 {
     this->dnsAddress = dnsAddress;
     filters[3] = true;
