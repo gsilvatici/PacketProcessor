@@ -204,17 +204,17 @@ Packet* PacketProcessor::replaceDnsAddress(Packet* parsedPacket)
             // request
             case 0:
                 if (ip4Layer && dnsAddress.isIPv4()) {
-                    ip4Layer->setDstIPv4Address(dnsAddress.getIPv4());
-                } else if (ip6Layer && dnsAddress.isIPv6()) {
-                    ip6Layer->setDstIPv6Address(dnsAddress.getIPv6());
+                    ip4Layer->setDstIPv4Address(this->dnsAddress.getIPv4());
+                } else if (ip6Layer && this->dnsAddress.isIPv6()) {
+                    ip6Layer->setDstIPv6Address(this->dnsAddress.getIPv6());
                 } 
                 break;
             // response
             case 1:
-                if (ip4Layer && dnsAddress.isIPv4()) {
-                    ip4Layer->setSrcIPv4Address(dnsAddress.getIPv4());
-                } else if (ip6Layer && dnsAddress.isIPv6()) {
-                    ip6Layer->setSrcIPv6Address(dnsAddress.getIPv6());
+                if (ip4Layer && this->dnsAddress.isIPv4()) {
+                    ip4Layer->setSrcIPv4Address(this->dnsAddress.getIPv4());
+                } else if (ip6Layer && this->dnsAddress.isIPv6()) {
+                    ip6Layer->setSrcIPv6Address(this->dnsAddress.getIPv6());
                 } 
                 break;
         }
