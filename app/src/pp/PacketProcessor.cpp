@@ -156,9 +156,8 @@ Packet* PacketProcessor::reduceTtl(Packet* parsedPacket)
             auto ipLayer = parsedPacket->getLayerOfType<IPv4Layer>();
             if (this->ttl < ipLayer->getIPv4Header()->timeToLive) {
                 ipLayer->getIPv4Header()->timeToLive -= this->ttl;
-                int aux = ipLayer->getIPv4Header()->timeToLive;
-                printf(" %d ", aux);
-                // std::cout << ipLayer->getIPv4Header()->timeToLive;
+                // int aux = ipLayer->getIPv4Header()->timeToLive;
+                // printf(" %d ", aux);
                 return parsedPacket;
             }
         }
@@ -195,17 +194,17 @@ Packet* PacketProcessor::replaceDnsAddress(Packet* parsedPacket)
         //    return;
 
 
-        pcpp::IPAddress srcIP = ipLayer->getSrcIPAddress();
-        pcpp::IPv4Layer* ip4Layer = dynamic_cast<pcpp::IPv4Layer*>(ipLayer);
-        pcpp::IPv6Layer* ip6Layer = dynamic_cast<pcpp::IPv6Layer*>(ipLayer);
+        // pcpp::IPAddress srcIP = ipLayer->getSrcIPAddress();
+        // pcpp::IPv4Layer* ip4Layer = dynamic_cast<pcpp::IPv4Layer*>(ipLayer);
+        // pcpp::IPv6Layer* ip6Layer = dynamic_cast<pcpp::IPv6Layer*>(ipLayer);
         
-        if (ip4Layer) {
-          ip4Layer->setSrcIPv4Address();
-          ip4Layer->setDstIPv4Address();
-        } else {
-          ip6Layer->setSrcIPv6Address();
-          ip6Layer->setDstIPv6Address();
-        }
+        // if (ip4Layer) {
+        //   ip4Layer->setSrcIPv4Address();
+        //   ip4Layer->setDstIPv4Address();
+        // } else {
+        //   ip6Layer->setSrcIPv6Address();
+        //   ip6Layer->setDstIPv6Address();
+        // }
 
         return parsedPacket;
     }

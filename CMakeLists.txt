@@ -21,11 +21,6 @@ find_package(GTest)
 if(GTEST_FOUND)
   add_executable(unit_tests ${sources_test} ${sources_pp})
 
-  # we add this define to prevent collision with the main
-  # this might be better solved by not adding the source with the main to the
-  # testing target
-  # target_compile_definitions(unit_tests PUBLIC TESTING)
-
   target_compile_options(unit_tests PUBLIC -static-libstdc++ -std=c++17 -I h -pthread -Wall)
 
   target_include_directories(unit_tests PUBLIC app/include /usr/local/include/pcapplusplus)
