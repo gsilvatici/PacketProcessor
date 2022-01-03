@@ -276,8 +276,9 @@ TEST(ReplaceDnsAddressAndPort, FromFileWithOnlyOneUDPPacketWithDNSLayer)
 
     outPacket = packetProcessor->replaceDnsAddress(&parsedPacket);    
 
-    // outPacket = packetProcessor->replaceDnsPort(&parsedPacket);    
+    outPacket = packetProcessor->replaceDnsPort(&parsedPacket);
 
+    // outPacket->getLayerOfType<IPv4Layer>()->getDstIPv4Address();
     // ASSERT_NE(outPacket, nullptr);
 }
 

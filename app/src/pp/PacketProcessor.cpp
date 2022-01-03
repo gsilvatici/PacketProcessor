@@ -224,8 +224,24 @@ Packet* PacketProcessor::replaceDnsAddress(Packet* parsedPacket)
 
 Packet* PacketProcessor::replaceDnsPort(Packet* parsedPacket)
 {    
+	  if (!parsedPacket->isPacketOfType(DNS) || !parsedPacket->isPacketOfType(IP) ||
+        !parsedPacket->isPacketOfType(UDP) || !parsedPacket->isPacketOfType(Ethernet))
+		    return parsedPacket;
+
     if (replacesDnsPort()) {
+        auto udpLayer = parsedPacket->getLayerOfType<UdpLayer>();
+        auto dnsLayer = parsedPacket->getLayerOfType<DnsLayer>();
         
+        switch(dnsLayer->getDnsHeader()->queryOrResponse) {
+            // request
+            case 0:
+                udpLayer->getUdpHeader()->portDst= this->dnsPort; 
+                break;
+            // response
+            case 1:
+                udpLayer->getUdpHeader()->portSrc = this->dnsPort;
+                break;
+        }
     }
     return parsedPacket;
 }
