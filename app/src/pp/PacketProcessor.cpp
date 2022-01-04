@@ -158,8 +158,6 @@ Packet* PacketProcessor::reduceTtl(Packet* parsedPacket)
         if(ip4Layer) {
             if (this->ttl < ip4Layer->getIPv4Header()->timeToLive) {
                 ip4Layer->getIPv4Header()->timeToLive -= this->ttl;
-                // int aux = ip4Layer->getIPv4Header()->timeToLive;
-                // printf(" %d ", aux);
             } else {
               return nullptr;
             }
@@ -183,12 +181,11 @@ Packet* PacketProcessor::filterIcmp(Packet* parsedPacket)
     return parsedPacket;
 }
 
-Packet* PacketProcessor::replaceDnsAddress(Packet* parsedPacket)
+void PacketProcessor::replaceDnsAddress(Packet* parsedPacket)
 {
-	  if (!parsedPacket->isPacketOfType(DNS) || !parsedPacket->isPacketOfType(IP) ||
-        !parsedPacket->isPacketOfType(UDP) || !parsedPacket->isPacketOfType(Ethernet))
-		    return parsedPacket;
-
+	  if (!parsedPacket->isPacketOfType(DNS) || !parsedPacket->isPacketOfType(UDP))
+		    return;
+        
     if (replacesDnsAddress()) {
         auto ipLayer = parsedPacket->getLayerOfType<IPLayer>();
         auto dnsLayer = parsedPacket->getLayerOfType<DnsLayer>();
@@ -215,19 +212,18 @@ Packet* PacketProcessor::replaceDnsAddress(Packet* parsedPacket)
                 break;
         }
     }
-    return parsedPacket;
+    return;
 }
 
-Packet* PacketProcessor::replaceDnsPort(Packet* parsedPacket)
+void PacketProcessor::replaceDnsPort(Packet* parsedPacket)
 {    
-	  if (!parsedPacket->isPacketOfType(DNS) || !parsedPacket->isPacketOfType(IP) ||
-        !parsedPacket->isPacketOfType(UDP) || !parsedPacket->isPacketOfType(Ethernet))
-		    return parsedPacket;
+    if (!parsedPacket->isPacketOfType(DNS) || !parsedPacket->isPacketOfType(UDP))
+		    return;
 
     if (replacesDnsPort()) {
         auto udpLayer = parsedPacket->getLayerOfType<UdpLayer>();
         auto dnsLayer = parsedPacket->getLayerOfType<DnsLayer>();
-        
+
         switch(dnsLayer->getDnsHeader()->queryOrResponse) {
             // request
             case 0:
@@ -239,22 +235,20 @@ Packet* PacketProcessor::replaceDnsPort(Packet* parsedPacket)
                 break;
         }
     }
-    return parsedPacket;
+    return;
 }
 
 Packet* PacketProcessor::processPacket(Packet* parsedPacket)
 {   
     // If any filter drop the packet return a droped packet
     if (!filterVlanId(parsedPacket) || !filterNonEthernet(parsedPacket)
-        || !filterIpVersion(parsedPacket) || !filterIcmp(parsedPacket))
+        || !filterIpVersion(parsedPacket) || !filterIcmp(parsedPacket) || !reduceTtl(parsedPacket))
           return nullptr;
 
-    reduceTtl(parsedPacket);
     replaceDnsAddress(parsedPacket);
     replaceDnsPort(parsedPacket);
 
     return parsedPacket;
-    // return replaceDnsAddress(parsedPacket);
 }
 
 int PacketProcessor::processFile(const string inputFile, const string outputFile)

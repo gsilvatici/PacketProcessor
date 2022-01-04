@@ -49,8 +49,8 @@ namespace pp
         pcpp::Packet* filterIpVersion(pcpp::Packet* parsedPacket);
         pcpp::Packet* reduceTtl(pcpp::Packet* parsedPacket);
         pcpp::Packet* filterIcmp(pcpp::Packet* parsedPacket);
-        pcpp::Packet* replaceDnsAddress(pcpp::Packet* parsedPacket);
-        pcpp::Packet* replaceDnsPort(pcpp::Packet* parsedPacket);
+        void replaceDnsAddress(pcpp::Packet* parsedPacket);
+        void replaceDnsPort(pcpp::Packet* parsedPacket);
         int processFile(const std::string inputFile, const std::string outputFile);
     };
 }

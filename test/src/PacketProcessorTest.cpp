@@ -272,11 +272,9 @@ TEST(ReplaceDnsAddress, FromFileWithOnlyOneUDPIpV4PacketWithDNSRequest)
     
     Packet parsedPacket(&rawPacket);
 
-    Packet* outPacket = nullptr;
+    packetProcessor->replaceDnsAddress(&parsedPacket);    
 
-    outPacket = packetProcessor->replaceDnsAddress(&parsedPacket);    
-
-    IPAddress serverAddress = outPacket->getLayerOfType<IPv4Layer>()->getDstIPv4Address();
+    IPAddress serverAddress = parsedPacket.getLayerOfType<IPv4Layer>()->getDstIPv4Address();
 
     ASSERT_EQ(serverAddress.getIPv4().toString(), "192.168.5.5");
 }
@@ -294,11 +292,9 @@ TEST(ReplaceDnsAddressAndPort, FromFileWithOnlyOneUDPIpV4PacketWithDNSResponse)
     
     Packet parsedPacket(&rawPacket);
 
-    Packet* outPacket = nullptr;
+    packetProcessor->replaceDnsAddress(&parsedPacket);    
 
-    outPacket = packetProcessor->replaceDnsAddress(&parsedPacket);    
-
-    IPAddress serverAddress = outPacket->getLayerOfType<IPv4Layer>()->getSrcIPv4Address();
+    IPAddress serverAddress = parsedPacket.getLayerOfType<IPv4Layer>()->getSrcIPv4Address();
 
     ASSERT_EQ(serverAddress.getIPv4().toString(), "192.168.5.5");
 }
@@ -316,11 +312,9 @@ TEST(ReplaceDnsAddress, DISABLED_FromFileWithOnlyOneUDPIpV6PacketWithDNSRequest)
     
     Packet parsedPacket(&rawPacket);
 
-    Packet* outPacket = nullptr;
+    packetProcessor->replaceDnsAddress(&parsedPacket);    
 
-    outPacket = packetProcessor->replaceDnsAddress(&parsedPacket);    
-
-    IPAddress serverAddress = outPacket->getLayerOfType<IPv6Layer>()->getDstIPv6Address();
+    IPAddress serverAddress = parsedPacket.getLayerOfType<IPv6Layer>()->getDstIPv6Address();
 
     ASSERT_EQ(serverAddress.getIPv6().toString(), "2001:0db8:85a3:0000:0000:8a2e:0370:7334");
 }
@@ -338,11 +332,9 @@ TEST(ReplaceDnsAddressAndPort, DISABLED_FromFileWithOnlyOneUDPIpV6PacketWithDNSR
     
     Packet parsedPacket(&rawPacket);
 
-    Packet* outPacket = nullptr;
+    packetProcessor->replaceDnsAddress(&parsedPacket);    
 
-    outPacket = packetProcessor->replaceDnsAddress(&parsedPacket);    
-
-    IPAddress serverAddress = outPacket->getLayerOfType<IPv6Layer>()->getSrcIPv6Address();
+    IPAddress serverAddress = parsedPacket.getLayerOfType<IPv6Layer>()->getSrcIPv6Address();
 
     ASSERT_EQ(serverAddress.getIPv6().toString(), "2001:0db8:85a3:0000:0000:8a2e:0370:7334");
 }
@@ -360,16 +352,9 @@ TEST(ReplaceDnsPort, FromFileWithOnlyOneUDPIpV4PacketWithDNSRequest)
     
     Packet parsedPacket(&rawPacket);
 
-    Packet* outPacket = nullptr;
+    packetProcessor->replaceDnsPort(&parsedPacket);
 
-    outPacket = packetProcessor->replaceDnsPort(&parsedPacket);    
-
-	// // reverse src and dst UDP ports
-	// uint16_t srcPort = udpLayer->getUdpHeader()->portSrc;
-	// udpLayer->getUdpHeader()->portSrc = udpLayer->getUdpHeader()->portDst;
-	// udpLayer->getUdpHeader()->portDst = srcPort;
-
-    uint16_t serverPort = outPacket->getLayerOfType<UdpLayer>()->getUdpHeader()->portDst;
+    uint16_t serverPort = parsedPacket.getLayerOfType<UdpLayer>()->getUdpHeader()->portDst;
 
     ASSERT_EQ(serverPort, 658);
 }
@@ -387,11 +372,9 @@ TEST(ReplaceDnsPort, FromFileWithOnlyOneUDPIpV4PacketWithDNSResponse)
     
     Packet parsedPacket(&rawPacket);
 
-    Packet* outPacket = nullptr;
+    packetProcessor->replaceDnsPort(&parsedPacket);    
 
-    outPacket = packetProcessor->replaceDnsPort(&parsedPacket);    
-
-    uint16_t serverPort = outPacket->getLayerOfType<UdpLayer>()->getUdpHeader()->portSrc;
+    uint16_t serverPort = parsedPacket.getLayerOfType<UdpLayer>()->getUdpHeader()->portSrc;
 
     ASSERT_EQ(serverPort, 658);
 }
