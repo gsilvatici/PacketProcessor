@@ -60,6 +60,14 @@ void PacketProcessorInitializer::run(int argc, char **argv)
         }
     }
     packetProcessor->processFile(inputFile, outputFile);
+
+    IPcapDevice::PcapStats stats;
+
+    packetProcessor->getPacketReader()->getStatistics(stats);
+    printf("Read %lu packets successfully and %lu packets could not be read\n", stats.packetsRecv, stats.packetsDrop);
+
+    packetProcessor->getPacketWriter()->getStatistics(stats);
+    printf("Written %lu packets successfully to pcap writer and %lu packets could not be written\n", stats.packetsRecv, stats.packetsDrop);
 }
 
 void PacketProcessorInitializer::printUsage()
@@ -76,9 +84,9 @@ void PacketProcessorInitializer::printUsage()
     << endl
     << "Optional parameters:" << endl
     << endl
-    << "    --vlan            : Drop packets that are not in the vlan id value specified" << endl
+    << "    --vlan            : Drop packets that are not in the same vlan id value specified" << endl
     << "    --ip-version      : Drop packets that are not in the same ip-version" << endl
-    << "    --ttl             : Value to decrease the TTL of a packet that is not on IPv4 or IPv6" << endl
+    << "    --ttl             : Value to decrease the TTL of an IP packet" << endl
     << "    --dns-addr        : DNS address to be replaced in a UDP packet with DNS layer" << endl
     << "    --dns-port        : DNS port to be replaced in in a UDP packet with DNS layer" << endl
     << "    -h                : Displays this help message and exits" << endl

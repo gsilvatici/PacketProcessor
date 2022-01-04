@@ -111,10 +111,7 @@ Packet* PacketProcessor::filterVlanId(Packet* parsedPacket)
 {
     if (this->filtersVLAN()) {
         auto vlanLayer = parsedPacket->getLayerOfType<VlanLayer>();
-        if (!vlanLayer) {
-            cerr << "Something went wrong, couldn't find VLAN id" << endl;
-        }
-        if (this->vlanId != vlanLayer->getVlanID()) {
+        if (vlanLayer && this->vlanId != vlanLayer->getVlanID()) {
               return nullptr;
         }
     }
@@ -194,7 +191,6 @@ Packet* PacketProcessor::replaceDnsAddress(Packet* parsedPacket)
 
     if (replacesDnsAddress()) {
         auto ipLayer = parsedPacket->getLayerOfType<IPLayer>();
-        auto udpLayer = parsedPacket->getLayerOfType<UdpLayer>();
         auto dnsLayer = parsedPacket->getLayerOfType<DnsLayer>();
 
         IPv4Layer* ip4Layer = dynamic_cast<IPv4Layer*>(ipLayer);
@@ -280,6 +276,6 @@ int PacketProcessor::processFile(const string inputFile, const string outputFile
 
           if (processedPacket)   
               writer->writePacket(*(processedPacket->getRawPacket()));       
-    }
+    }       
     return 0;
 }

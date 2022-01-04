@@ -16,7 +16,7 @@ namespace pp
         {"ip-version", optional_argument, 0, ipVersion},
         {"ttl",        optional_argument, 0, ttl},
         {"dns-addr",   optional_argument, 0, dnsAddr},
-        {"dns-addr",   optional_argument, 0, dnsPort},
+        {"dns-port",   optional_argument, 0, dnsPort},
         {"help",       no_argument,       0, 'h'},
         {0, 0, 0, 0}
     };
