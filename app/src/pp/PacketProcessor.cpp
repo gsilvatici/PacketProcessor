@@ -231,7 +231,7 @@ Packet* PacketProcessor::replaceDnsPort(Packet* parsedPacket)
         switch(dnsLayer->getDnsHeader()->queryOrResponse) {
             // request
             case 0:
-                udpLayer->getUdpHeader()->portDst= this->dnsPort; 
+                udpLayer->getUdpHeader()->portDst = this->dnsPort; 
                 break;
             // response
             case 1:
@@ -249,7 +249,12 @@ Packet* PacketProcessor::processPacket(Packet* parsedPacket)
         || !filterIpVersion(parsedPacket) || !filterIcmp(parsedPacket))
           return nullptr;
 
-    return reduceTtl(parsedPacket);
+    reduceTtl(parsedPacket);
+    replaceDnsAddress(parsedPacket);
+    replaceDnsPort(parsedPacket);
+
+    return parsedPacket;
+    // return replaceDnsAddress(parsedPacket);
 }
 
 int PacketProcessor::processFile(const string inputFile, const string outputFile)
