@@ -259,7 +259,7 @@ TEST(FilterICMPPacket, FromFileWithOnlyOneICMPPacket)
     ASSERT_NE(outPacket, nullptr);
 }
 
-TEST(ReplaceDnsAddressAndPort, FromFileWithOnlyOneUDPPacketWithDNSLayer) 
+TEST(ReplaceDnsAddress, FromFileWithOnlyOneUDPIpV4PacketWithDNSRequest) 
 {
     unique_ptr<PacketProcessor> packetProcessor(new PacketProcessor());
     packetProcessor->setDnsAddress(IPAddress("192.168.5.5"));
@@ -276,10 +276,124 @@ TEST(ReplaceDnsAddressAndPort, FromFileWithOnlyOneUDPPacketWithDNSLayer)
 
     outPacket = packetProcessor->replaceDnsAddress(&parsedPacket);    
 
-    outPacket = packetProcessor->replaceDnsPort(&parsedPacket);
+    IPAddress serverAddress = outPacket->getLayerOfType<IPv4Layer>()->getDstIPv4Address();
 
-    // outPacket->getLayerOfType<IPv4Layer>()->getDstIPv4Address();
-    // ASSERT_NE(outPacket, nullptr);
+    ASSERT_EQ(serverAddress.getIPv4().toString(), "192.168.5.5");
+}
+
+TEST(ReplaceDnsAddressAndPort, FromFileWithOnlyOneUDPIpV4PacketWithDNSResponse) 
+{
+    unique_ptr<PacketProcessor> packetProcessor(new PacketProcessor());
+    packetProcessor->setDnsAddress(IPAddress("192.168.5.5"));
+    packetProcessor->initializeReader("../test/data/capture/single_packet_pcaps/dns_response_packet.pcapng");
+
+    IFileReaderDevice* reader = packetProcessor->getPacketReader();
+
+    RawPacket rawPacket;
+	  reader->getNextPacket(rawPacket);
+    
+    Packet parsedPacket(&rawPacket);
+
+    Packet* outPacket = nullptr;
+
+    outPacket = packetProcessor->replaceDnsAddress(&parsedPacket);    
+
+    IPAddress serverAddress = outPacket->getLayerOfType<IPv4Layer>()->getSrcIPv4Address();
+
+    ASSERT_EQ(serverAddress.getIPv4().toString(), "192.168.5.5");
+}
+
+TEST(ReplaceDnsAddress, DISABLED_FromFileWithOnlyOneUDPIpV6PacketWithDNSRequest) 
+{
+    unique_ptr<PacketProcessor> packetProcessor(new PacketProcessor());
+    packetProcessor->setDnsAddress(IPAddress("2001:0db8:85a3:0000:0000:8a2e:0370:7334"));
+    packetProcessor->initializeReader("../test/data/capture/single_packet_pcaps/dns_request_packet.pcapng");
+
+    IFileReaderDevice* reader = packetProcessor->getPacketReader();
+
+    RawPacket rawPacket;
+	  reader->getNextPacket(rawPacket);
+    
+    Packet parsedPacket(&rawPacket);
+
+    Packet* outPacket = nullptr;
+
+    outPacket = packetProcessor->replaceDnsAddress(&parsedPacket);    
+
+    IPAddress serverAddress = outPacket->getLayerOfType<IPv6Layer>()->getDstIPv6Address();
+
+    ASSERT_EQ(serverAddress.getIPv6().toString(), "2001:0db8:85a3:0000:0000:8a2e:0370:7334");
+}
+
+TEST(ReplaceDnsAddressAndPort, DISABLED_FromFileWithOnlyOneUDPIpV6PacketWithDNSResponse) 
+{
+    unique_ptr<PacketProcessor> packetProcessor(new PacketProcessor());
+    packetProcessor->setDnsAddress(IPAddress("2001:0db8:85a3:0000:0000:8a2e:0370:7334"));
+    packetProcessor->initializeReader("../test/data/capture/single_packet_pcaps/dns_response_packet.pcapng");
+
+    IFileReaderDevice* reader = packetProcessor->getPacketReader();
+
+    RawPacket rawPacket;
+	  reader->getNextPacket(rawPacket);
+    
+    Packet parsedPacket(&rawPacket);
+
+    Packet* outPacket = nullptr;
+
+    outPacket = packetProcessor->replaceDnsAddress(&parsedPacket);    
+
+    IPAddress serverAddress = outPacket->getLayerOfType<IPv6Layer>()->getSrcIPv6Address();
+
+    ASSERT_EQ(serverAddress.getIPv6().toString(), "2001:0db8:85a3:0000:0000:8a2e:0370:7334");
+}
+
+TEST(ReplaceDnsPort, FromFileWithOnlyOneUDPIpV4PacketWithDNSRequest) 
+{
+    unique_ptr<PacketProcessor> packetProcessor(new PacketProcessor());
+    packetProcessor->setDnsPort(658);
+    packetProcessor->initializeReader("../test/data/capture/single_packet_pcaps/dns_request_packet.pcapng");
+
+    IFileReaderDevice* reader = packetProcessor->getPacketReader();
+
+    RawPacket rawPacket;
+	  reader->getNextPacket(rawPacket);
+    
+    Packet parsedPacket(&rawPacket);
+
+    Packet* outPacket = nullptr;
+
+    outPacket = packetProcessor->replaceDnsPort(&parsedPacket);    
+
+	// // reverse src and dst UDP ports
+	// uint16_t srcPort = udpLayer->getUdpHeader()->portSrc;
+	// udpLayer->getUdpHeader()->portSrc = udpLayer->getUdpHeader()->portDst;
+	// udpLayer->getUdpHeader()->portDst = srcPort;
+
+    uint16_t serverPort = outPacket->getLayerOfType<UdpLayer>()->getUdpHeader()->portDst;
+
+    ASSERT_EQ(serverPort, 658);
+}
+
+TEST(ReplaceDnsPort, FromFileWithOnlyOneUDPIpV4PacketWithDNSResponse) 
+{
+    unique_ptr<PacketProcessor> packetProcessor(new PacketProcessor());
+    packetProcessor->setDnsPort(658);
+    packetProcessor->initializeReader("../test/data/capture/single_packet_pcaps/dns_response_packet.pcapng");
+
+    IFileReaderDevice* reader = packetProcessor->getPacketReader();
+
+    RawPacket rawPacket;
+	  reader->getNextPacket(rawPacket);
+    
+    Packet parsedPacket(&rawPacket);
+
+    Packet* outPacket = nullptr;
+
+    outPacket = packetProcessor->replaceDnsPort(&parsedPacket);    
+
+    uint16_t serverPort = outPacket->getLayerOfType<UdpLayer>()->getUdpHeader()->portSrc;
+
+    ASSERT_EQ(serverPort, 658);
 }
 
 }
