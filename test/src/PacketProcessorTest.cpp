@@ -6,21 +6,6 @@ using namespace std;
 using namespace pcpp;
 using namespace pp;
 
-namespace
-{
-class PacketProcessorTest : public ::testing::Test
-{
-  protected:
-
-    void SetUp() override
-    {
-    }
-
-    void TearDown() override
-    {
-    }
-};
-
 TEST(Initializer, InitializeReader)
 {
     unique_ptr<PacketProcessor> packetProcessor(new PacketProcessor());
@@ -377,8 +362,6 @@ TEST(ReplaceDnsServerPort, FromFileWithOnlyOneUDPIpV4PacketWithDNSResponse)
     uint16_t serverPort = htons(parsedPacket.getLayerOfType<UdpLayer>()->getUdpHeader()->portSrc);
 
     ASSERT_EQ(serverPort, 658);
-}
-
 }
 
 int main(int argc, char **argv)
