@@ -9,6 +9,7 @@
 #include "IPv6Layer.h"
 #include "Packet.h"
 #include "PcapFileDevice.h"
+#include "TcpLayer.h"
 #include "UdpLayer.h"
 #include "VlanLayer.h"
 
@@ -52,6 +53,7 @@ namespace pp
         pcpp::Packet* filterIcmp(pcpp::Packet* parsedPacket);
         void replaceDnsAddress(pcpp::Packet* parsedPacket);
         void replaceDnsPort(pcpp::Packet* parsedPacket);
+        Packet* dropDuplicateTcpPacket(pcpp::Packet* parsedPacket);
         int processFile(const std::string inputFile, const std::string outputFile);
     };
 }

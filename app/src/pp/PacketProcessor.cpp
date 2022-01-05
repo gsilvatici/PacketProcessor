@@ -240,6 +240,21 @@ void PacketProcessor::replaceDnsPort(Packet* parsedPacket)
     return;
 }
 
+Packet* PacketProcessor::dropDuplicateTcpPacket(Packet* parsedPacket)
+{    
+    if (!parsedPacket->isPacketOfType(TCP))
+		    return parsedPacket;
+
+    auto tcpLayer = parsedPacket->getLayerOfType<TcpLayer>();
+
+    uint32_t seq = tcpLayer->getTcpHeader()->sequenceNumber;
+
+    // if (seq) 
+      // return nullptr;
+
+    return parsedPacket;
+}
+
 Packet* PacketProcessor::processPacket(Packet* parsedPacket)
 {   
     // If any filter drop the packet return a droped packet
