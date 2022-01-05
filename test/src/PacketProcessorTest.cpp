@@ -22,36 +22,39 @@ TEST(Initializer, InitializeWriter)
     ASSERT_EQ(initStatus, true);
 }
 
-TEST(FilterPacketWithVlanIdNotEqual23, DISABLED_FromFileWithOnlyOnePacketAndDistinctId) 
+TEST(FilterPacketWithVlanIdNotEqual30, FromFileWithOnlyOneVlanPacketAndDistinctId) 
 {
     unique_ptr<PacketProcessor> packetProcessor(new PacketProcessor());
-    uint16_t vlanId = 23;
+    uint16_t vlanId = 28;
     packetProcessor->setVlanId(vlanId);
-    packetProcessor->initializeReader("../test/data/capture/single_packet_pcaps/ipv4_packet_bis.pcap");
+    packetProcessor->initializeReader("../test/data/capture/single_packet_pcaps/vlan_packet.pcap");
 
     IFileReaderDevice* reader = packetProcessor->getPacketReader();
 
     RawPacket rawPacket;
 	  reader->getNextPacket(rawPacket);
     Packet parsedPacket(&rawPacket);
+    Packet* outPacket = nullptr;
     
-    Packet* outPacket = packetProcessor->filterVlanId(&parsedPacket);
+    outPacket = packetProcessor->filterVlanId(&parsedPacket);
 
     ASSERT_EQ(outPacket, nullptr);
 }
 
-TEST(FilterPacketWithVlanIdNotEqual23, DISABLED_FromFileWithOnlyOnePacketAndSameId) 
+TEST(FilterPacketWithVlanIdNotEqual30, FromFileWithOnlyOneVlanPacketAndSameId) 
 {
     unique_ptr<PacketProcessor> packetProcessor(new PacketProcessor());
-    packetProcessor->setVlanId(23);
-    packetProcessor->initializeReader("../test/data/capture/single_packet_pcaps/ipv4_packet.pcap");
+    packetProcessor->setVlanId(30);
+    packetProcessor->initializeReader("../test/data/capture/single_packet_pcaps/vlan_packet.pcap");
 
     IFileReaderDevice* reader = packetProcessor->getPacketReader();
 
     RawPacket rawPacket;
 	  reader->getNextPacket(rawPacket);
     Packet parsedPacket(&rawPacket);
-    Packet* outPacket = packetProcessor->filterVlanId(&parsedPacket);
+    Packet* outPacket = nullptr;
+
+    outPacket = packetProcessor->filterVlanId(&parsedPacket);
   
     ASSERT_NE(outPacket, nullptr);
 }
@@ -65,12 +68,11 @@ TEST(FilterEthernetPacket, FromFileWithOnlyOneEthernetPacket)
 
     RawPacket rawPacket;
     reader->getNextPacket(rawPacket);
-    
     Packet parsedPacket(&rawPacket);
+    Packet* outPacket = nullptr;
 
-    Packet* outPacket = packetProcessor->filterNonEthernet(&parsedPacket);
+    outPacket = packetProcessor->filterNonEthernet(&parsedPacket);
     
-    //Since it is a ethernet packet it should not filter it and return it back
     ASSERT_NE(outPacket, nullptr);
 }
 
@@ -83,9 +85,9 @@ TEST(FilterEthernetPacket, FromFileWithOnlyOneNonEthernetPacket)
     RawPacket rawPacket;
     reader->getNextPacket(rawPacket);
     Packet parsedPacket(&rawPacket);
+    Packet* outPacket = nullptr;
 
-    //Since it is not an ethernet packet (is a PPP) it should filter it and return null
-    Packet* outPacket = packetProcessor->filterNonEthernet(&parsedPacket);
+    outPacket = packetProcessor->filterNonEthernet(&parsedPacket);
     
     ASSERT_EQ(outPacket, nullptr);
 }

@@ -109,7 +109,7 @@ PcapFileWriterDevice* PacketProcessor::getPacketWriter()
 
 Packet* PacketProcessor::filterVlanId(Packet* parsedPacket)
 {
-    if (this->filtersVLAN()) {
+    if (this->filtersVLAN() && parsedPacket->isPacketOfType(VLAN)) {
         auto vlanLayer = parsedPacket->getLayerOfType<VlanLayer>();
         if (vlanLayer && this->vlanId != vlanLayer->getVlanID()) {
               return nullptr;
@@ -211,6 +211,7 @@ void PacketProcessor::replaceDnsAddress(Packet* parsedPacket)
                 } 
                 break;
         }
+        parsedPacket->computeCalculateFields();
     }
     return;
 }
@@ -234,6 +235,7 @@ void PacketProcessor::replaceDnsPort(Packet* parsedPacket)
                 udpLayer->getUdpHeader()->portSrc = ntohs(this->dnsPort);
                 break;
         }
+        parsedPacket->computeCalculateFields();
     }
     return;
 }
