@@ -227,11 +227,11 @@ void PacketProcessor::replaceDnsPort(Packet* parsedPacket)
         switch(dnsLayer->getDnsHeader()->queryOrResponse) {
             // request
             case 0:
-                udpLayer->getUdpHeader()->portDst = this->dnsPort; 
+                udpLayer->getUdpHeader()->portDst = ntohs(this->dnsPort); 
                 break;
             // response
             case 1:
-                udpLayer->getUdpHeader()->portSrc = this->dnsPort;
+                udpLayer->getUdpHeader()->portSrc = ntohs(this->dnsPort);
                 break;
         }
     }
@@ -241,8 +241,8 @@ void PacketProcessor::replaceDnsPort(Packet* parsedPacket)
 Packet* PacketProcessor::processPacket(Packet* parsedPacket)
 {   
     // If any filter drop the packet return a droped packet
-    if (!filterVlanId(parsedPacket) || !filterNonEthernet(parsedPacket)
-        || !filterIpVersion(parsedPacket) || !filterIcmp(parsedPacket) || !reduceTtl(parsedPacket))
+    if (!filterVlanId(parsedPacket) || !filterNonEthernet(parsedPacket) || !filterIpVersion(parsedPacket) 
+        || !filterIcmp(parsedPacket) || !reduceTtl(parsedPacket))
           return nullptr;
 
     replaceDnsAddress(parsedPacket);

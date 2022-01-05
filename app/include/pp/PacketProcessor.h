@@ -1,6 +1,7 @@
 #ifndef PACKETPROCESSOR_H_
 #define PACKETPROCESSOR_H_
 
+#include <arpa/inet.h>
 #include <iostream>
 
 #include "DnsLayer.h"
