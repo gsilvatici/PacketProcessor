@@ -31,10 +31,6 @@ if(GTEST_FOUND)
 
   target_link_libraries(${PROJECT_NAME} libPcap++.a libPacket++.a libCommon++.a libpcap.a pthread.a)
 
-  # this allows us to use our executable as a link library
-  # therefore we can inherit all compiler options and library dependencies
-  # set_target_properties(pcap-convert PROPERTIES ENABLE_EXPORTS on)
-
   target_link_libraries(unit_tests PUBLIC
     ${GTEST_BOTH_LIBRARIES} libPcap++.a libPacket++.a libCommon++.a libpcap.a libpthread.a
     # pcap-convert
