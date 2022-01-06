@@ -249,8 +249,10 @@ Packet* PacketProcessor::dropDuplicateTcpPacket(Packet* parsedPacket)
 
     uint32_t seq = tcpLayer->getTcpHeader()->sequenceNumber;
 
-    // if (seq) 
-      // return nullptr;
+    if (sequenceSet.find(seq) == sequenceSet.end())
+        sequenceSet.insert(seq);
+    else
+        return nullptr;
 
     return parsedPacket;
 }

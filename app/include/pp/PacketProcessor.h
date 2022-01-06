@@ -3,6 +3,7 @@
 
 #include <arpa/inet.h>
 #include <iostream>
+#include <unordered_set>
 
 #include "DnsLayer.h"
 #include "IPv4Layer.h"
@@ -26,6 +27,7 @@ namespace pp
         std::unique_ptr<pcpp::IFileReaderDevice> reader;
         std::unique_ptr<pcpp::PcapFileWriterDevice> writer;
         std::unique_ptr<bool []> filters;
+        std::unordered_set<uint32_t> sequenceSet;
         bool filtersVLAN();
         bool filtersIpVersion();
         bool reducesTtl();
@@ -53,7 +55,7 @@ namespace pp
         pcpp::Packet* filterIcmp(pcpp::Packet* parsedPacket);
         void replaceDnsAddress(pcpp::Packet* parsedPacket);
         void replaceDnsPort(pcpp::Packet* parsedPacket);
-        Packet* dropDuplicateTcpPacket(pcpp::Packet* parsedPacket);
+        pcpp::Packet* dropDuplicateTcpPacket(pcpp::Packet* parsedPacket);
         int processFile(const std::string inputFile, const std::string outputFile);
     };
 }
