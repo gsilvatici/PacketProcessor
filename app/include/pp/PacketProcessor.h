@@ -11,6 +11,7 @@
 #include "Packet.h"
 #include "PcapFileDevice.h"
 #include "TcpLayer.h"
+#include "TcpReassembly.h"
 #include "UdpLayer.h"
 #include "VlanLayer.h"
 
@@ -27,13 +28,15 @@ namespace pp
         std::unique_ptr<pcpp::IFileReaderDevice> reader;
         std::unique_ptr<pcpp::PcapFileWriterDevice> writer;
         std::unique_ptr<bool []> filters;
-        std::unordered_set<uint32_t> sequenceSet;
+        std::unordered_set<std::string> sequenceIdSet;
         bool filtersVLAN();
         bool filtersIpVersion();
         bool reducesTtl();
         bool replacesDnsAddress();
         bool replacesDnsPort();
+        bool monitorsTcp();
         pcpp::Packet* processPacket(pcpp::Packet* parsedPacket);
+        std::unique_ptr<pcpp::TcpReassembly> tcpReassembly;
 
       public:
         PacketProcessor();
@@ -44,6 +47,7 @@ namespace pp
         void setTtl(const uint8_t ttl);
         void setDnsAddress(const pcpp::IPAddress &dnsAddress);
         void setDnsPort(const uint16_t dnsPort);
+        void setTcpMonitor();
         bool initializeReader(const std::string inputFile);
         bool initializeWriter(const std::string outputFile);
         pcpp::IFileReaderDevice* getPacketReader();
@@ -55,7 +59,10 @@ namespace pp
         pcpp::Packet* filterIcmp(pcpp::Packet* parsedPacket);
         void replaceDnsAddress(pcpp::Packet* parsedPacket);
         void replaceDnsPort(pcpp::Packet* parsedPacket);
-        pcpp::Packet* dropDuplicateTcpPacket(pcpp::Packet* parsedPacket);
+        bool isDuplicateTcpPacket(pcpp::Packet* parsedPacket);
+        bool isZeroWidowTcpPacket(pcpp::Packet* parsedPacket);
+        bool isRetransmitedTcpPacket(pcpp::Packet* parsedPacket);
+        void monitorTcp(pcpp::Packet* parsedPacket);
         int processFile(const std::string inputFile, const std::string outputFile);
     };
 }

@@ -6,7 +6,7 @@
 
 namespace pp
 {
-    enum { def, vlan, ipVersion, ttl, dnsAddr, dnsPort };
+    enum { def, vlan, ipVersion, ttl, dnsAddr, dnsPort, tcpMonitor};
 
     static struct option ArgOptions[] =
     {
@@ -17,6 +17,7 @@ namespace pp
         {"ttl",        optional_argument, 0, ttl},
         {"dns-addr",   optional_argument, 0, dnsAddr},
         {"dns-port",   optional_argument, 0, dnsPort},
+        {"tcp-monitor",   optional_argument, 0, tcpMonitor},
         {"help",       no_argument,       0, 'h'},
         {0, 0, 0, 0}
     };

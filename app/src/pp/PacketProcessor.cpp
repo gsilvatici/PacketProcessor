@@ -4,15 +4,27 @@ using namespace std;
 using namespace pp;
 using namespace pcpp;
 
+static void tcpReassemblyMsgReadyCallback(int8_t sideIndex, const pcpp::TcpStreamData& tcpData, void* userCookie)
+{
+}
+
+static void tcpReassemblyConnectionStartCallback(const pcpp::ConnectionData& connectionData, void* userCookie)
+{
+}
+
+static void tcpReassemblyConnectionEndCallback(const pcpp::ConnectionData& connectionData, pcpp::TcpReassembly::ConnectionEndReason reason, void* userCookie)
+{
+}
+
 PacketProcessor::PacketProcessor()
 {
-    filters.reset(new bool[5] {false, false, false, false, false});
+    filters.reset(new bool[6] {false, false, false, false, false, false});
 }
 
 PacketProcessor::PacketProcessor(const uint16_t vlanId, const uint8_t ipVersion, const uint8_t ttl, const IPAddress &dnsAddress, const uint16_t dnsPort)
     : vlanId(vlanId), ipVersion(ipVersion), ttl(ttl), dnsAddress(dnsAddress), dnsPort(dnsPort), reader(nullptr), writer(nullptr)
 {
-    filters.reset(new bool[5] {true, true, true, true, true});
+    filters.reset(new bool[6] {true, true, true, true, true, false});
 }
 
 PacketProcessor::~PacketProcessor()
@@ -54,6 +66,12 @@ void PacketProcessor::setDnsPort(const uint16_t dnsPort)
     filters[4] = true;
 }
 
+void PacketProcessor::setTcpMonitor()
+{
+    tcpReassembly.reset(new TcpReassembly(tcpReassemblyMsgReadyCallback, nullptr, tcpReassemblyConnectionStartCallback, tcpReassemblyConnectionEndCallback));
+    filters[5] = true;
+}
+
 bool PacketProcessor::filtersVLAN()
 {
     return filters[0];
@@ -77,6 +95,11 @@ bool PacketProcessor::replacesDnsAddress()
 bool PacketProcessor::replacesDnsPort()
 {
     return filters[4];
+}
+
+bool PacketProcessor::monitorsTcp()
+{
+    return filters[5];
 }
 
 bool PacketProcessor::initializeReader(const string inputFile)
@@ -150,27 +173,27 @@ Packet* PacketProcessor::reduceTtl(Packet* parsedPacket)
 	  if (!parsedPacket->isPacketOfType(IP))
 		    return parsedPacket;
 
-    if (this->reducesTtl()) {
-        auto ipLayer = parsedPacket->getLayerOfType<IPLayer>();
-        auto ip4Layer = dynamic_cast<IPv4Layer*>(ipLayer);
-        auto ip6Layer = dynamic_cast<IPv6Layer*>(ipLayer);
+    // if (this->reducesTtl()) {
+    //     auto ipLayer = parsedPacket->getLayerOfType<IPLayer>();
+    //     auto ip4Layer = dynamic_cast<IPv4Layer*>(ipLayer);
+    //     auto ip6Layer = dynamic_cast<IPv6Layer*>(ipLayer);
 
-        if(ip4Layer) {
-            if (this->ttl < ip4Layer->getIPv4Header()->timeToLive) {
-                ip4Layer->getIPv4Header()->timeToLive -= this->ttl;
-            } else {
-              return nullptr;
-            }
-        }
-        if(ip6Layer) {
-            if (this->ttl < ip6Layer->getIPv6Header()->hopLimit) {
-                ip6Layer->getIPv6Header()->hopLimit -= this->ttl;
-            } else {
-              return nullptr;
-            }
-        }
-    }
-    return parsedPacket;
+    //     if(ip4Layer) {
+    //         if (this->ttl < ip4Layer->getIPv4Header()->timeToLive) {
+    //             ip4Layer->getIPv4Header()->timeToLive -= this->ttl;
+    //         } else {
+    //           return nullptr;
+    //         }
+    //     }
+    //     if(ip6Layer) {
+    //         if (this->ttl < ip6Layer->getIPv6Header()->hopLimit) {
+    //             ip6Layer->getIPv6Header()->hopLimit -= this->ttl;
+    //         } else {
+    //           return nullptr;
+    //         }
+    //     }
+    // }
+    // return parsedPacket;
 }
 
 Packet* PacketProcessor::filterIcmp(Packet* parsedPacket)
@@ -186,33 +209,33 @@ void PacketProcessor::replaceDnsAddress(Packet* parsedPacket)
 	  if (!parsedPacket->isPacketOfType(DNS) || !parsedPacket->isPacketOfType(UDP))
 		    return;
         
-    if (replacesDnsAddress()) {
-        auto ipLayer = parsedPacket->getLayerOfType<IPLayer>();
-        auto dnsLayer = parsedPacket->getLayerOfType<DnsLayer>();
+    // if (replacesDnsAddress()) {
+    //     auto ipLayer = parsedPacket->getLayerOfType<IPLayer>();
+    //     auto dnsLayer = parsedPacket->getLayerOfType<DnsLayer>();
 
-        IPv4Layer* ip4Layer = dynamic_cast<IPv4Layer*>(ipLayer);
-        IPv6Layer* ip6Layer = dynamic_cast<IPv6Layer*>(ipLayer);
+    //     IPv4Layer* ip4Layer = dynamic_cast<IPv4Layer*>(ipLayer);
+    //     IPv6Layer* ip6Layer = dynamic_cast<IPv6Layer*>(ipLayer);
         
-        switch(dnsLayer->getDnsHeader()->queryOrResponse) {
-            // request
-            case 0:
-                if (ip4Layer && dnsAddress.isIPv4()) {
-                    ip4Layer->setDstIPv4Address(this->dnsAddress.getIPv4());
-                } else if (ip6Layer && this->dnsAddress.isIPv6()) {
-                    ip6Layer->setDstIPv6Address(this->dnsAddress.getIPv6());
-                } 
-                break;
-            // response
-            case 1:
-                if (ip4Layer && this->dnsAddress.isIPv4()) {
-                    ip4Layer->setSrcIPv4Address(this->dnsAddress.getIPv4());
-                } else if (ip6Layer && this->dnsAddress.isIPv6()) {
-                    ip6Layer->setSrcIPv6Address(this->dnsAddress.getIPv6());
-                } 
-                break;
-        }
-        parsedPacket->computeCalculateFields();
-    }
+    //     switch(dnsLayer->getDnsHeader()->queryOrResponse) {
+    //         // request
+    //         case 0:
+    //             if (ip4Layer && dnsAddress.isIPv4()) {
+    //                 ip4Layer->setDstIPv4Address(this->dnsAddress.getIPv4());
+    //             } else if (ip6Layer && this->dnsAddress.isIPv6()) {
+    //                 ip6Layer->setDstIPv6Address(this->dnsAddress.getIPv6());
+    //             } 
+    //             break;
+    //         // response
+    //         case 1:
+    //             if (ip4Layer && this->dnsAddress.isIPv4()) {
+    //                 ip4Layer->setSrcIPv4Address(this->dnsAddress.getIPv4());
+    //             } else if (ip6Layer && this->dnsAddress.isIPv6()) {
+    //                 ip6Layer->setSrcIPv6Address(this->dnsAddress.getIPv6());
+    //             } 
+    //             break;
+    //     }
+    //     parsedPacket->computeCalculateFields();
+    // }
     return;
 }
 
@@ -240,21 +263,58 @@ void PacketProcessor::replaceDnsPort(Packet* parsedPacket)
     return;
 }
 
-Packet* PacketProcessor::dropDuplicateTcpPacket(Packet* parsedPacket)
+bool PacketProcessor::isDuplicateTcpPacket(Packet* parsedPacket)
 {    
     if (!parsedPacket->isPacketOfType(TCP))
-		    return parsedPacket;
+		    return false;
 
     auto tcpLayer = parsedPacket->getLayerOfType<TcpLayer>();
 
+    auto ipLayer = parsedPacket->getLayerOfType<IPv4Layer>();
+
+    uint16_t ipId = ipLayer->getIPv4Header()->ipId;
+
     uint32_t seq = tcpLayer->getTcpHeader()->sequenceNumber;
 
-    if (sequenceSet.find(seq) == sequenceSet.end())
-        sequenceSet.insert(seq);
-    else
-        return nullptr;
+    std::string sequenceWithid = std::to_string(seq) + "_" + std::to_string(ipId);
 
-    return parsedPacket;
+    if (sequenceIdSet.find(sequenceWithid) == sequenceIdSet.end())
+        sequenceIdSet.insert(sequenceWithid);
+    else
+        return true;
+
+    return false;
+}
+
+bool PacketProcessor::isZeroWidowTcpPacket(Packet* parsedPacket)
+{    
+    if (!parsedPacket->isPacketOfType(TCP))
+		    return false;
+
+    auto tcpLayer = parsedPacket->getLayerOfType<TcpLayer>();
+
+    if (tcpLayer->getTcpHeader()->windowSize == 0) 
+        return true;
+
+    return false;
+}
+
+bool PacketProcessor::isRetransmitedTcpPacket(Packet* parsedPacket)
+{    
+    if (!parsedPacket->isPacketOfType(TCP))
+		    return false;
+
+    if (tcpReassembly->reassemblePacket((Packet&)parsedPacket) == TcpReassembly::ReassemblyStatus::Ignore_Retransimission) {
+        return true;
+    }
+
+    return false;
+}
+
+void PacketProcessor::monitorTcp(Packet* parsedPacket)
+{    
+    if (!this->monitorsTcp())
+		    return;
 }
 
 Packet* PacketProcessor::processPacket(Packet* parsedPacket)
@@ -267,6 +327,7 @@ Packet* PacketProcessor::processPacket(Packet* parsedPacket)
     replaceDnsAddress(parsedPacket);
     replaceDnsPort(parsedPacket);
 
+    monitorTcp(parsedPacket);
     return parsedPacket;
 }
 

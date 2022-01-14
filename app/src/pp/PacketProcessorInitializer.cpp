@@ -50,6 +50,9 @@ void PacketProcessorInitializer::run(int argc, char **argv)
                     packetProcessor->setDnsPort(atoi(optarg));
                 }
                 break;
+            case tcpMonitor:
+                packetProcessor->setTcpMonitor();
+                break;
             case 'h':
                 printUsage();
                 exit(0);
